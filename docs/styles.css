@@ -118,3 +118,8 @@ a.navbar-brand:hover {
   padding-top: 3em !important; /*adding so much padding because theme adds a margin-top: -65px by default */
   margin-bottom: 0.75em;
 }
+
+
+.author,.title{
+    display: none;
+}
