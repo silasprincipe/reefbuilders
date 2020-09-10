@@ -1,13 +1,12 @@
 ---
-title: Mussismilia hispida 
+title: 
 output:
   html_document:
     toc: true
     toc_depth: 2
     toc_float: true
 ---
-  
-  
+
 # Current and future projections of *Mussismilia hispida* niche
 
 ## Current ecological niche
