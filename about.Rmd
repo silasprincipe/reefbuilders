@@ -1,0 +1,35 @@
+---
+title: 
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+---
+
+```{r eval=FALSE, include=FALSE}
+pal <- colorNumeric(c("#0C2C84", "#41B6C4", "#FFFFCC"), values(r.env),
+  na.color = "transparent")
+
+leaflet() %>%
+  # Base groups
+  addTiles(group = "OSM (default)") %>%
+  addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
+  addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>%
+  # Overlay groups
+  addMarkers(data = pts,
+    clusterOptions = markerClusterOptions(),
+    group = "Presence points"
+  ) %>%
+  addRasterImage(r.env, colors = pal, opacity = 0.9, group = "Temperature") %>%
+  addLegend(pal = pal, values = values(r.env),
+    title = "Surface temp", position = "bottomright", group = "Temperature") %>%
+  # Layers control
+  addLayersControl(
+    baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
+    overlayGroups = c("Presence points", "Temperature"),
+    options = layersControlOptions(collapsed = T)
+  )
+
+```
+

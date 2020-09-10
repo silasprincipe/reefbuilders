@@ -1,0 +1,185 @@
+---
+title: Mussismilia hispida 
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+---
+  
+  
+# Current and future projections of *Mussismilia hispida* niche
+
+## Current ecological niche
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+library(leaflet)
+library(raster)
+
+r <- raster("maps/muhi_current.tif")
+
+pts <- read.csv("data/muhi_cell.csv")
+
+pts <- pts[pts[,3] == 1,1:2]
+
+pts <- SpatialPoints(pts, proj4string = CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+
+
+r2 <- projectRaster(r, 
+                    crs = "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs", method = "ngb")
+
+
+binpal <- colorBin(c("#2c3e50","#00DBC7"), c(0,1),na.color = NA, 2, pretty = FALSE)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+leaflet() %>%
+  # Base groups
+  addProviderTiles(providers$Esri.OceanBasemap, group = "Esri Ocean") %>%
+  addProviderTiles(providers$CartoDB.Positron, group = "CartoDB") %>%
+  addProviderTiles(providers$CartoDB.DarkMatter, group = "CartoDB Dark") %>%
+  # Overlay groups
+  addMarkers(data = pts,
+    clusterOptions = markerClusterOptions(),
+    group = "Presence points"
+  ) %>%
+  addRasterImage(r2, colors = binpal, opacity = 0.9, group = "Suitability projection") %>%
+  addLegend(colors = c("#2c3e50","#00DBC7"), labels = c("Absence", "Presence"),
+            title = "Habitat suitability", opacity = 1,
+            group = "Suitability projection")%>%
+  # Layers control
+  addLayersControl(
+    baseGroups = c("Esri Ocean", "CartoDB", "CartoDB Dark"),
+    overlayGroups = c("Presence points", "Suitability projection"),
+    options = layersControlOptions(collapsed = T),
+    position = "bottomright"
+  )
+
+```
+
+
+## RCP 2.6 scenario projection
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+r <- raster("maps/muhi_rcp26.tif")
+
+r2 <- projectRaster(r, 
+                    crs = "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs", method = 'ngb')
+
+r2 <- raster::asFactor(r2)
+
+#0 is unsuitable area, 1 area that was lost, 2 area that gained, 3 kept area
+
+pal <- colorFactor(c("#2c3e50","#f1e40e","#a13eda","#00c5b3"), 
+                levels = c(0,1,2,3), na.color = NA)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+leaflet() %>%
+  # Base groups
+  addProviderTiles(providers$Esri.OceanBasemap, group = "Esri Ocean") %>%
+  addProviderTiles(providers$CartoDB.Positron, group = "CartoDB") %>%
+  addProviderTiles(providers$CartoDB.DarkMatter, group = "CartoDB Dark") %>%
+  # Overlay groups
+  addMarkers(data = pts,
+    clusterOptions = markerClusterOptions(),
+    group = "Presence points"
+  ) %>%
+  addRasterImage(r2, colors = pal, opacity = 0.9, group = "Projection") %>%
+  addLegend(colors = c("#2c3e50","#f1e40e","#a13eda","#00c5b3"), labels = c("Unsuitable", "Lost","Gain","Kept"),
+            title = "Habitat suitability", opacity = 1, group = "Projection")%>%
+  # Layers control
+  addLayersControl(
+    baseGroups = c("Esri Ocean", "CartoDB", "CartoDB Dark"),
+    overlayGroups = c("Presence points", "Projection"),
+    options = layersControlOptions(collapsed = T),
+    position = "bottomright"
+  )%>%
+  hideGroup("Presence points")
+
+```
+
+## RCP 4.5 scenario projection
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+r <- raster("maps/muhi_rcp45.tif")
+
+r2 <- projectRaster(r, 
+                    crs = "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs", method = 'ngb')
+
+r2 <- raster::asFactor(r2)
+
+#0 is unsuitable area, 1 area that was lost, 2 area that gained, 3 kept area
+
+pal <- colorFactor(c("#2c3e50","#f1e40e","#a13eda","#00c5b3"), 
+                levels = c(0,1,2,3), na.color = NA)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+leaflet() %>%
+  # Base groups
+  addProviderTiles(providers$Esri.OceanBasemap, group = "Esri Ocean") %>%
+  addProviderTiles(providers$CartoDB.Positron, group = "CartoDB") %>%
+  addProviderTiles(providers$CartoDB.DarkMatter, group = "CartoDB Dark") %>%
+  # Overlay groups
+  addMarkers(data = pts,
+    clusterOptions = markerClusterOptions(),
+    group = "Presence points"
+  ) %>%
+  addRasterImage(r2, colors = pal, opacity = 0.9, group = "Projection") %>%
+  addLegend(colors = c("#2c3e50","#f1e40e","#a13eda","#00c5b3"), labels = c("Unsuitable", "Lost","Gain","Kept"),
+            title = "Habitat suitability", opacity = 1, group = "Projection")%>%
+  # Layers control
+  addLayersControl(
+    baseGroups = c("Esri Ocean", "CartoDB", "CartoDB Dark"),
+    overlayGroups = c("Presence points", "Projection"),
+    options = layersControlOptions(collapsed = T),
+    position = "bottomright"
+  )%>%
+  hideGroup("Presence points")
+
+```
+
+## RCP 8.5 scenario projection
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+r <- raster("maps/muhi_rcp85.tif")
+
+r2 <- projectRaster(r, 
+                    crs = "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs", method = 'ngb')
+
+r2 <- raster::asFactor(r2)
+
+#0 is unsuitable area, 1 area that was lost, 2 area that gained, 3 kept area
+
+pal <- colorFactor(c("#2c3e50","#f1e40e","#a13eda","#00c5b3"), 
+                levels = c(0,1,2,3), na.color = NA)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+leaflet() %>%
+  # Base groups
+  addProviderTiles(providers$Esri.OceanBasemap, group = "Esri Ocean") %>%
+  addProviderTiles(providers$CartoDB.Positron, group = "CartoDB") %>%
+  addProviderTiles(providers$CartoDB.DarkMatter, group = "CartoDB Dark") %>%
+  # Overlay groups
+  addMarkers(data = pts,
+    clusterOptions = markerClusterOptions(),
+    group = "Presence points"
+  ) %>%
+  addRasterImage(r2, colors = pal, opacity = 0.9, group = "Projection") %>%
+  addLegend(colors = c("#2c3e50","#f1e40e","#a13eda","#00c5b3"), labels = c("Unsuitable", "Lost","Gain","Kept"),
+            title = "Habitat suitability", opacity = 1, group = "Projection")%>%
+  # Layers control
+  addLayersControl(
+    baseGroups = c("Esri Ocean", "CartoDB", "CartoDB Dark"),
+    overlayGroups = c("Presence points", "Projection"),
+    options = layersControlOptions(collapsed = T),
+    position = "bottomright"
+  )%>%
+  hideGroup("Presence points")
+
+```

@@ -1,0 +1,35 @@
+name: "my-website"
+output_dir: docs
+navbar:
+  title: "Climate change effects on Atlantic Reef Builders"
+  left:
+    - text: "Introduction"
+      href: index.html
+    - text: "Summary"
+      href: about.html
+    - text: "Results"
+      icon: fa-chart-area
+      menu:
+        - text: "Species models"
+        - text: "Mussismilia hispida"
+          href: muhi.html
+        - text: "Montastraea cavernosa"
+          href: muhi.html
+        - text: "Siderastrea"
+          href: muhi.html
+        - text: "Composition"
+        - text: "RCP 2.6"
+          href: muhi.html
+        - text: "RCP 4.5"
+          href: muhi.html
+        - text: "RCP 8.5"
+          href: muhi.html
+  right:
+    - text: "Download source data"
+      icon: fa-github
+      href: about.html
+output:
+  html_document:
+    theme: cosmo
+    highlight: textmate
+    css: styles.css
