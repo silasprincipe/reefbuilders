@@ -14,24 +14,28 @@ navbar:
         - text: "Mussismilia hispida"
           href: muhi.html
         - text: "Montastraea cavernosa"
-          href: muhi.html
+          href: moca.html
         - text: "Siderastrea"
-          href: muhi.html
+          href: side.html
         - text: "Composition"
         - text: "RCP 2.6"
-          href: muhi.html
+          href: composite26.html
         - text: "RCP 4.5"
-          href: muhi.html
+          href: composite45.html
         - text: "RCP 8.5"
-          href: muhi.html
+          href: composite85.html
+        - text: "Support data"
+        - text: "Climate layers"
+          href: climate_layers.html
   right:
     - text: "Download source data"
       icon: fa-github
-      href: about.html
+      href: https://github.com/silasprincipe/reefbuilders
 output:
   html_document:
     theme: cosmo
     highlight: textmate
     css: styles.css
-    include:
+    includes:
+      in_header: header.html
       after_body: footer.html

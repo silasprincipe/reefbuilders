@@ -1,0 +1,154 @@
+---
+title: "Composition of suitable niche - RCP 8.5"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+---
+
+# Composition of species - RCP 8.5 Scenario
+
+## Change in composition
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+library(raster)
+library(leaflet)
+
+r <- raster("maps/rcp85_composition_change.tif")
+
+r2 <- projectRaster(r, 
+                    crs = "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs", method = 'ngb')
+
+r2 <- r2 * -1
+
+r2 <- raster::asFactor(r2)
+
+#0 is unsuitable area, 1 area that was lost, 2 area that gained, 3 kept area
+
+pal <- colorFactor(c("#fb7d06", "#f3b70d", "#F9FF07","#2c3e50",
+                     "#07FFEC","#3CB68C","#158349"), 
+                levels = c(-3, -2, -1, 0, 1, 2, 3), na.color = NA)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+leaflet() %>%
+  # Base groups
+  addProviderTiles(providers$Esri.OceanBasemap, group = "Esri Ocean") %>%
+  addProviderTiles(providers$CartoDB.Positron, group = "CartoDB") %>%
+  addProviderTiles(providers$CartoDB.DarkMatter, group = "CartoDB Dark") %>%
+  # Overlay groups
+  addRasterImage(r2, colors = pal, opacity = 0.9, group = "Projection") %>%
+  addLegend(colors = c("#fb7d06", "#f3b70d", "#F9FF07","#2c3e50",
+                     "#07FFEC","#3CB68C","#158349"), labels = c("-3",
+                                                                "-2","-1","0",
+                                                                "1","2","3"),
+            title = "Change in species", opacity = 1, group = "Projection")%>%
+  # Layers control
+  addLayersControl(
+    baseGroups = c("Esri Ocean", "CartoDB", "CartoDB Dark"),
+    overlayGroups = c("Projection"),
+    options = layersControlOptions(collapsed = T),
+    position = "bottomright"
+  )
+
+```
+
+## Species composition
+
+Note that you can add a tile with the current composition.
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+r <- raster("maps/rcp85_composition_species.tif")
+
+r2 <- projectRaster(r, 
+                    crs = "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs", method = 'ngb')
+
+r2 <- raster::asFactor(r2)
+
+
+rc <- raster("maps/current_composition.tif")
+
+rc2 <- projectRaster(rc, 
+                    crs = "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs", method = 'ngb')
+
+rc2 <- raster::asFactor(rc2)
+
+#0 is unsuitable area, 1 area that was lost, 2 area that gained, 3 kept area
+
+pal <- colorFactor(
+  c(
+    "#2c3e50",
+    "#e69f00",
+    "#56b4e9",
+    "#009e73",
+    "#f0e442",
+    "#0072b2",
+    "#d55e00",
+    "#ab59ad"
+  ),
+                levels = c(0, 1, 2, 6, 3, 7, 8, 9), na.color = NA)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+leaflet() %>%
+  # Base groups
+  addProviderTiles(providers$Esri.OceanBasemap, group = "Esri Ocean") %>%
+  addProviderTiles(providers$CartoDB.Positron, group = "CartoDB") %>%
+  addProviderTiles(providers$CartoDB.DarkMatter, group = "CartoDB Dark") %>%
+  # Overlay groups
+  addRasterImage(r2, colors = pal, opacity = 0.9, group = "Future") %>%
+  addLegend(colors = c(
+    "#2c3e50",
+    "#e69f00",
+    "#56b4e9",
+    "#009e73",
+    "#f0e442",
+    "#0072b2",
+    "#d55e00",
+    "#ab59ad"
+  ), labels = c(
+                                        "Unsuitable",
+                                        "Mussismilia hispida",
+                                        "Montastraea cavernosa",
+                                        "Siderastrea",
+                                        "M. hispida and M. cavernosa",
+                                        "Siderastrea and M. hispida",
+                                        "Siderastrea and M. cavernosa",
+                                        "All species"
+  ),
+            title = "Species composition", opacity = 1, group = "Future")%>%
+  #Current layer
+  addRasterImage(rc2, colors = pal, opacity = 0.9, group = "Current") %>%
+  addLegend(colors = c(
+    "#2c3e50",
+    "#e69f00",
+    "#56b4e9",
+    "#009e73",
+    "#f0e442",
+    "#0072b2",
+    "#d55e00",
+    "#ab59ad"
+  ), labels = c(
+                                        "Unsuitable",
+                                        "Mussismilia hispida",
+                                        "Montastraea cavernosa",
+                                        "Siderastrea",
+                                        "M. hispida and M. cavernosa",
+                                        "Siderastrea and M. hispida",
+                                        "Siderastrea and M. cavernosa",
+                                        "All species"
+  ),
+            title = "Species composition", opacity = 1, group = "Current")%>%
+  # Layers control
+  addLayersControl(
+    baseGroups = c("Esri Ocean", "CartoDB", "CartoDB Dark"),
+    overlayGroups = c("Future", "Current"),
+    options = layersControlOptions(collapsed = T),
+    position = "bottomright"
+  )%>%
+  hideGroup("Current")
+
+```

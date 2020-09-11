@@ -1,0 +1,427 @@
+---
+title: "Climate layers used in the modelling"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+---
+
+# Climate layers used in the modelling of reef builders niche
+
+## Current climate
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+library(raster)
+library(leaflet)
+
+layers <- list()
+pallist <- list()
+
+files <- list.files("env/crop_layers", full.names = T)
+
+for (i in 1:length(files)) {
+  
+  r <- raster(files[i])
+  
+  r <- projectRaster(r, 
+                    crs = "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs", method = 'bilinear')
+  
+  layers[[i]] <- r
+  
+  pal <- colorNumeric(palette = "viridis", values(r),
+  na.color = "transparent")
+  
+  pallist[[i]] <- pal
+  
+}
+
+
+  bath <- raster("env/bath_layers/bath_2_100.tif")
+  
+  bath <- projectRaster(bath, 
+                    crs = "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs", method = 'bilinear')
+  
+  pal.b <- colorNumeric(palette = "viridis", values(bath),
+  na.color = "transparent")
+  
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+leaflet() %>%
+  # Base groups
+  addProviderTiles(providers$Esri.OceanBasemap, group = "Esri Ocean") %>%
+  addProviderTiles(providers$CartoDB.Positron, group = "CartoDB") %>%
+  addProviderTiles(providers$CartoDB.DarkMatter, group = "CartoDB Dark") %>%
+  # Overlay groups
+  addRasterImage(layers[[1]], colors = pallist[[1]], opacity = 1, group = "Calcite") %>%
+  addLegend(pal = pallist[[1]], values = values(layers[[1]]),
+            title = "Calcite - mean (mol/m³)", opacity = 1, group = "Calcite")%>%
+  addRasterImage(layers[[2]], colors = pallist[[2]], opacity = 1, group = "Cloud cover") %>%
+  addLegend(pal = pallist[[2]], values = values(layers[[2]]),
+            title = "Cloud cover - max (%)", opacity = 1, group = "Cloud cover")%>%
+  addRasterImage(layers[[3]], colors = pallist[[3]], opacity = 1, group = "pH") %>%
+  addLegend(pal = pallist[[3]], values = values(layers[[3]]),
+            title = "pH - mean", opacity = 1, group = "pH")%>%
+  addRasterImage(layers[[4]], colors = pallist[[4]], opacity = 1, group = "Chlorophyll-a") %>%
+  addLegend(pal = pallist[[4]], values = values(layers[[4]]),
+            title = "Chlorophyll-a - max (mg/m³)", opacity = 1, group = "Chlorophyll-a")%>%
+  addRasterImage(layers[[5]], colors = pallist[[5]], opacity = 1, group = "Current velocity") %>%
+  addLegend(pal = pallist[[5]], values = values(layers[[5]]),
+            title = "Current velocity - mean (m/s)", opacity = 1, group = "Current velocity")%>%
+  addRasterImage(layers[[6]], colors = pallist[[6]], opacity = 1, group = "Nitrate") %>%
+  addLegend(pal = pallist[[6]], values = values(layers[[6]]),
+            title = "Nitrate - mean (mmol/m³)", opacity = 1, group = "Nitrate")%>%
+  addRasterImage(layers[[7]], colors = pallist[[7]], opacity = 1, group = "Phosphate") %>%
+  addLegend(pal = pallist[[7]], values = values(layers[[7]]),
+            title = "Phosphate - max (mmol/m³)", opacity = 1, group = "Phosphate")%>%
+  addRasterImage(layers[[8]], colors = pallist[[8]], opacity = 1, group = "Salinity") %>%
+  addLegend(pal = pallist[[8]], values = values(layers[[8]]),
+            title = "Salinity - mean", opacity = 1, group = "Salinity")%>%
+  addRasterImage(layers[[9]], colors = pallist[[9]], opacity = 1, group = "Silicate") %>%
+  addLegend(pal = pallist[[9]], values = values(layers[[9]]),
+            title = "Silicate - mean (mmol/m³)", opacity = 1, group = "Silicate")%>%
+  addRasterImage(layers[[10]], colors = pallist[[10]], opacity = 1, group = "Temperature") %>%
+  addLegend(pal = pallist[[10]], values = values(layers[[10]]),
+            title = "Temperature - max (°C)", opacity = 1, group = "Temperature")%>%
+  addRasterImage(layers[[11]], colors = pallist[[11]], opacity = 1, group = "Wind speed") %>%
+  addLegend(pal = pallist[[11]], values = values(layers[[11]]),
+            title = "Wind speed - mean (m/s)", opacity = 1, group = "Wind speed")%>%
+  addRasterImage(bath, colors = pal.b, opacity = 1, group = "Depth") %>%
+  addLegend(pal = pal.b, values = values(bath),
+            title = "Depth (m)", opacity = 1, group = "Depth")%>%
+  # Layers control
+  addLayersControl(
+    baseGroups = c("Esri Ocean", "CartoDB", "CartoDB Dark"),
+    overlayGroups = c("Calcite",
+                      "Cloud cover",
+                      "pH",
+                      "Chlorophyll-a",
+                      "Current velocity",
+                      "Nitrate",
+                      "Phosphate",
+                      "Salinity",
+                      "Silicate",
+                      "Temperature",
+                      "Wind speed",
+                      "Depth"),
+    options = layersControlOptions(collapsed = T),
+    position = "bottomright"
+  )%>%hideGroup(c("Cloud cover",
+                      "pH",
+                      "Chlorophyll-a",
+                      "Current velocity",
+                      "Nitrate",
+                      "Phosphate",
+                      "Salinity",
+                      "Silicate",
+                      "Temperature",
+                      "Wind speed",
+                  "Depth"))
+
+```
+
+## RCP 2.6 scenario
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+layers <- list()
+pallist <- list()
+
+files <- list.files("env/proj_layers/rcp26/2100", full.names = T)
+
+for (i in 1:length(files)) {
+  
+  r <- raster(files[i])
+  
+  r <- projectRaster(r, 
+                    crs = "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs", method = 'bilinear')
+  
+  layers[[i]] <- r
+  
+  pal <- colorNumeric(palette = "viridis", values(r),
+  na.color = "transparent")
+  
+  pallist[[i]] <- pal
+  
+}
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+leaflet() %>%
+  # Base groups
+  addProviderTiles(providers$Esri.OceanBasemap, group = "Esri Ocean") %>%
+  addProviderTiles(providers$CartoDB.Positron, group = "CartoDB") %>%
+  addProviderTiles(providers$CartoDB.DarkMatter, group = "CartoDB Dark") %>%
+  # Overlay groups
+  addRasterImage(layers[[1]], colors = pallist[[1]], opacity = 1, group = "Calcite") %>%
+  addLegend(pal = pallist[[1]], values = values(layers[[1]]),
+            title = "Calcite - mean (mol/m³)", opacity = 1, group = "Calcite")%>%
+  addRasterImage(layers[[2]], colors = pallist[[2]], opacity = 1, group = "Cloud cover") %>%
+  addLegend(pal = pallist[[2]], values = values(layers[[2]]),
+            title = "Cloud cover - max (%)", opacity = 1, group = "Cloud cover")%>%
+  addRasterImage(layers[[3]], colors = pallist[[3]], opacity = 1, group = "pH") %>%
+  addLegend(pal = pallist[[3]], values = values(layers[[3]]),
+            title = "pH - mean", opacity = 1, group = "pH")%>%
+  addRasterImage(layers[[4]], colors = pallist[[4]], opacity = 1, group = "Chlorophyll-a") %>%
+  addLegend(pal = pallist[[4]], values = values(layers[[4]]),
+            title = "Chlorophyll-a - max (mg/m³)", opacity = 1, group = "Chlorophyll-a")%>%
+  addRasterImage(layers[[5]], colors = pallist[[5]], opacity = 1, group = "Current velocity") %>%
+  addLegend(pal = pallist[[5]], values = values(layers[[5]]),
+            title = "Current velocity - mean (m/s)", opacity = 1, group = "Current velocity")%>%
+  addRasterImage(layers[[6]], colors = pallist[[6]], opacity = 1, group = "Nitrate") %>%
+  addLegend(pal = pallist[[6]], values = values(layers[[6]]),
+            title = "Nitrate - mean (mmol/m³)", opacity = 1, group = "Nitrate")%>%
+  addRasterImage(layers[[7]], colors = pallist[[7]], opacity = 1, group = "Phosphate") %>%
+  addLegend(pal = pallist[[7]], values = values(layers[[7]]),
+            title = "Phosphate - max (mmol/m³)", opacity = 1, group = "Phosphate")%>%
+  addRasterImage(layers[[8]], colors = pallist[[8]], opacity = 1, group = "Salinity") %>%
+  addLegend(pal = pallist[[8]], values = values(layers[[8]]),
+            title = "Salinity - mean", opacity = 1, group = "Salinity")%>%
+  addRasterImage(layers[[9]], colors = pallist[[9]], opacity = 1, group = "Silicate") %>%
+  addLegend(pal = pallist[[9]], values = values(layers[[9]]),
+            title = "Silicate - mean (mmol/m³)", opacity = 1, group = "Silicate")%>%
+  addRasterImage(layers[[10]], colors = pallist[[10]], opacity = 1, group = "Temperature") %>%
+  addLegend(pal = pallist[[10]], values = values(layers[[10]]),
+            title = "Temperature - max (°C)", opacity = 1, group = "Temperature")%>%
+  addRasterImage(layers[[11]], colors = pallist[[11]], opacity = 1, group = "Wind speed") %>%
+  addLegend(pal = pallist[[11]], values = values(layers[[11]]),
+            title = "Wind speed - mean (m/s)", opacity = 1, group = "Wind speed")%>%
+  addRasterImage(bath, colors = pal.b, opacity = 1, group = "Depth") %>%
+  addLegend(pal = pal.b, values = values(bath),
+            title = "Depth (m)", opacity = 1, group = "Depth")%>%
+  # Layers control
+  addLayersControl(
+    baseGroups = c("Esri Ocean", "CartoDB", "CartoDB Dark"),
+    overlayGroups = c("Calcite",
+                      "Cloud cover",
+                      "pH",
+                      "Chlorophyll-a",
+                      "Current velocity",
+                      "Nitrate",
+                      "Phosphate",
+                      "Salinity",
+                      "Silicate",
+                      "Temperature",
+                      "Wind speed",
+                      "Depth"),
+    options = layersControlOptions(collapsed = T),
+    position = "bottomright"
+  )%>%hideGroup(c("Cloud cover",
+                      "pH",
+                      "Chlorophyll-a",
+                      "Current velocity",
+                      "Nitrate",
+                      "Phosphate",
+                      "Salinity",
+                      "Silicate",
+                      "Temperature",
+                      "Wind speed",
+                  "Depth"))
+
+```
+
+## RCP 4.5 scenario
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+layers <- list()
+pallist <- list()
+
+files <- list.files("env/proj_layers/rcp45/2100", full.names = T)
+
+for (i in 1:length(files)) {
+  
+  r <- raster(files[i])
+  
+  r <- projectRaster(r, 
+                    crs = "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs", method = 'bilinear')
+  
+  layers[[i]] <- r
+  
+  pal <- colorNumeric(palette = "viridis", values(r),
+  na.color = "transparent")
+  
+  pallist[[i]] <- pal
+  
+}
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+leaflet() %>%
+  # Base groups
+  addProviderTiles(providers$Esri.OceanBasemap, group = "Esri Ocean") %>%
+  addProviderTiles(providers$CartoDB.Positron, group = "CartoDB") %>%
+  addProviderTiles(providers$CartoDB.DarkMatter, group = "CartoDB Dark") %>%
+  # Overlay groups
+  addRasterImage(layers[[1]], colors = pallist[[1]], opacity = 1, group = "Calcite") %>%
+  addLegend(pal = pallist[[1]], values = values(layers[[1]]),
+            title = "Calcite - mean (mol/m³)", opacity = 1, group = "Calcite")%>%
+  addRasterImage(layers[[2]], colors = pallist[[2]], opacity = 1, group = "Cloud cover") %>%
+  addLegend(pal = pallist[[2]], values = values(layers[[2]]),
+            title = "Cloud cover - max (%)", opacity = 1, group = "Cloud cover")%>%
+  addRasterImage(layers[[3]], colors = pallist[[3]], opacity = 1, group = "pH") %>%
+  addLegend(pal = pallist[[3]], values = values(layers[[3]]),
+            title = "pH - mean", opacity = 1, group = "pH")%>%
+  addRasterImage(layers[[4]], colors = pallist[[4]], opacity = 1, group = "Chlorophyll-a") %>%
+  addLegend(pal = pallist[[4]], values = values(layers[[4]]),
+            title = "Chlorophyll-a - max (mg/m³)", opacity = 1, group = "Chlorophyll-a")%>%
+  addRasterImage(layers[[5]], colors = pallist[[5]], opacity = 1, group = "Current velocity") %>%
+  addLegend(pal = pallist[[5]], values = values(layers[[5]]),
+            title = "Current velocity - mean (m/s)", opacity = 1, group = "Current velocity")%>%
+  addRasterImage(layers[[6]], colors = pallist[[6]], opacity = 1, group = "Nitrate") %>%
+  addLegend(pal = pallist[[6]], values = values(layers[[6]]),
+            title = "Nitrate - mean (mmol/m³)", opacity = 1, group = "Nitrate")%>%
+  addRasterImage(layers[[7]], colors = pallist[[7]], opacity = 1, group = "Phosphate") %>%
+  addLegend(pal = pallist[[7]], values = values(layers[[7]]),
+            title = "Phosphate - max (mmol/m³)", opacity = 1, group = "Phosphate")%>%
+  addRasterImage(layers[[8]], colors = pallist[[8]], opacity = 1, group = "Salinity") %>%
+  addLegend(pal = pallist[[8]], values = values(layers[[8]]),
+            title = "Salinity - mean", opacity = 1, group = "Salinity")%>%
+  addRasterImage(layers[[9]], colors = pallist[[9]], opacity = 1, group = "Silicate") %>%
+  addLegend(pal = pallist[[9]], values = values(layers[[9]]),
+            title = "Silicate - mean (mmol/m³)", opacity = 1, group = "Silicate")%>%
+  addRasterImage(layers[[10]], colors = pallist[[10]], opacity = 1, group = "Temperature") %>%
+  addLegend(pal = pallist[[10]], values = values(layers[[10]]),
+            title = "Temperature - max (°C)", opacity = 1, group = "Temperature")%>%
+  addRasterImage(layers[[11]], colors = pallist[[11]], opacity = 1, group = "Wind speed") %>%
+  addLegend(pal = pallist[[11]], values = values(layers[[11]]),
+            title = "Wind speed - mean (m/s)", opacity = 1, group = "Wind speed")%>%
+  addRasterImage(bath, colors = pal.b, opacity = 1, group = "Depth") %>%
+  addLegend(pal = pal.b, values = values(bath),
+            title = "Depth (m)", opacity = 1, group = "Depth")%>%
+  # Layers control
+  addLayersControl(
+    baseGroups = c("Esri Ocean", "CartoDB", "CartoDB Dark"),
+    overlayGroups = c("Calcite",
+                      "Cloud cover",
+                      "pH",
+                      "Chlorophyll-a",
+                      "Current velocity",
+                      "Nitrate",
+                      "Phosphate",
+                      "Salinity",
+                      "Silicate",
+                      "Temperature",
+                      "Wind speed",
+                      "Depth"),
+    options = layersControlOptions(collapsed = T),
+    position = "bottomright"
+  )%>%hideGroup(c("Cloud cover",
+                      "pH",
+                      "Chlorophyll-a",
+                      "Current velocity",
+                      "Nitrate",
+                      "Phosphate",
+                      "Salinity",
+                      "Silicate",
+                      "Temperature",
+                      "Wind speed",
+                  "Depth"))
+
+```
+
+## RCP 8.5 scenario
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+layers <- list()
+pallist <- list()
+
+files <- list.files("env/proj_layers/rcp85/2100", full.names = T)
+
+for (i in 1:length(files)) {
+  
+  r <- raster(files[i])
+  
+  r <- projectRaster(r, 
+                    crs = "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs", method = 'bilinear')
+  
+  layers[[i]] <- r
+  
+  pal <- colorNumeric(palette = "viridis", values(r),
+  na.color = "transparent")
+  
+  pallist[[i]] <- pal
+  
+}
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+leaflet() %>%
+  # Base groups
+  addProviderTiles(providers$Esri.OceanBasemap, group = "Esri Ocean") %>%
+  addProviderTiles(providers$CartoDB.Positron, group = "CartoDB") %>%
+  addProviderTiles(providers$CartoDB.DarkMatter, group = "CartoDB Dark") %>%
+  # Overlay groups
+  addRasterImage(layers[[1]], colors = pallist[[1]], opacity = 1, group = "Calcite") %>%
+  addLegend(pal = pallist[[1]], values = values(layers[[1]]),
+            title = "Calcite - mean (mol/m³)", opacity = 1, group = "Calcite")%>%
+  addRasterImage(layers[[2]], colors = pallist[[2]], opacity = 1, group = "Cloud cover") %>%
+  addLegend(pal = pallist[[2]], values = values(layers[[2]]),
+            title = "Cloud cover - max (%)", opacity = 1, group = "Cloud cover")%>%
+  addRasterImage(layers[[3]], colors = pallist[[3]], opacity = 1, group = "pH") %>%
+  addLegend(pal = pallist[[3]], values = values(layers[[3]]),
+            title = "pH - mean", opacity = 1, group = "pH")%>%
+  addRasterImage(layers[[4]], colors = pallist[[4]], opacity = 1, group = "Chlorophyll-a") %>%
+  addLegend(pal = pallist[[4]], values = values(layers[[4]]),
+            title = "Chlorophyll-a - max (mg/m³)", opacity = 1, group = "Chlorophyll-a")%>%
+  addRasterImage(layers[[5]], colors = pallist[[5]], opacity = 1, group = "Current velocity") %>%
+  addLegend(pal = pallist[[5]], values = values(layers[[5]]),
+            title = "Current velocity - mean (m/s)", opacity = 1, group = "Current velocity")%>%
+  addRasterImage(layers[[6]], colors = pallist[[6]], opacity = 1, group = "Nitrate") %>%
+  addLegend(pal = pallist[[6]], values = values(layers[[6]]),
+            title = "Nitrate - mean (mmol/m³)", opacity = 1, group = "Nitrate")%>%
+  addRasterImage(layers[[7]], colors = pallist[[7]], opacity = 1, group = "Phosphate") %>%
+  addLegend(pal = pallist[[7]], values = values(layers[[7]]),
+            title = "Phosphate - max (mmol/m³)", opacity = 1, group = "Phosphate")%>%
+  addRasterImage(layers[[8]], colors = pallist[[8]], opacity = 1, group = "Salinity") %>%
+  addLegend(pal = pallist[[8]], values = values(layers[[8]]),
+            title = "Salinity - mean", opacity = 1, group = "Salinity")%>%
+  addRasterImage(layers[[9]], colors = pallist[[9]], opacity = 1, group = "Silicate") %>%
+  addLegend(pal = pallist[[9]], values = values(layers[[9]]),
+            title = "Silicate - mean (mmol/m³)", opacity = 1, group = "Silicate")%>%
+  addRasterImage(layers[[10]], colors = pallist[[10]], opacity = 1, group = "Temperature") %>%
+  addLegend(pal = pallist[[10]], values = values(layers[[10]]),
+            title = "Temperature - max (°C)", opacity = 1, group = "Temperature")%>%
+  addRasterImage(layers[[11]], colors = pallist[[11]], opacity = 1, group = "Wind speed") %>%
+  addLegend(pal = pallist[[11]], values = values(layers[[11]]),
+            title = "Wind speed - mean (m/s)", opacity = 1, group = "Wind speed")%>%
+  addRasterImage(bath, colors = pal.b, opacity = 1, group = "Depth") %>%
+  addLegend(pal = pal.b, values = values(bath),
+            title = "Depth (m)", opacity = 1, group = "Depth")%>%
+  # Layers control
+  addLayersControl(
+    baseGroups = c("Esri Ocean", "CartoDB", "CartoDB Dark"),
+    overlayGroups = c("Calcite",
+                      "Cloud cover",
+                      "pH",
+                      "Chlorophyll-a",
+                      "Current velocity",
+                      "Nitrate",
+                      "Phosphate",
+                      "Salinity",
+                      "Silicate",
+                      "Temperature",
+                      "Wind speed",
+                      "Depth"),
+    options = layersControlOptions(collapsed = T),
+    position = "bottomright"
+  )%>%hideGroup(c("Cloud cover",
+                      "pH",
+                      "Chlorophyll-a",
+                      "Current velocity",
+                      "Nitrate",
+                      "Phosphate",
+                      "Salinity",
+                      "Silicate",
+                      "Temperature",
+                      "Wind speed",
+                  "Depth"))
+
+```

@@ -296,3 +296,58 @@ changeSuit("rb_1", "rcp85")
 
 
 compSuit("rb_1", "rcp85")
+
+
+currentSuit <-
+        function(round.code) {
+                
+                current <- stack()
+                
+                for (i in 1:3) {
+                        sp <- c("muhi", "moca", "side")[i]
+                        
+                        orig <- raster(
+                                paste0(
+                                        sp,
+                                        "/proj_current_",
+                                        sp,
+                                        "_",
+                                        round.code,
+                                        "/individual_projections/",
+                                        sp,
+                                        "_EMcaByTSS_mergedAlgo_mergedRun_mergedData.img"
+                                )
+                        )
+                        
+                        # eval <-
+                        #         read.csv(
+                        #                 paste0(
+                        #                         sp,
+                        #                         "/evals/ensemble_eval_",
+                        #                         sp,
+                        #                         "_",
+                        #                         round.code,
+                        #                         ".csv"
+                        #                 )
+                        #         )
+                        # 
+                        # eval <-
+                        #         eval[eval$Model.name %in% c("EMwmeanByTSS_mergedAlgo_mergedRun_mergedData"),]
+                        # eval <-
+                        #         eval %>% filter(Eval.metric == 'TSS')
+                        # thres <- eval$Cutoff
+                        thres <- 800
+                        
+                        orig[orig < thres] <- 0
+                        orig[orig >= thres] <- i
+                        
+                        current <- stack(current, orig)
+                        
+                }
+                
+                current[[3]] <- current[[3]] * 2
+                
+                r <- sum(current)
+                
+                writeRaster(r, "current_composition.tif")
+        }
