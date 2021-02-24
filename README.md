@@ -12,7 +12,8 @@ referred to the publication “Predicted shifts in the distributions of
 Atlantic reef-building corals in the face of climate change” (under
 consideration for publishing). All codes and data used in the study are
 available in this folder, except original climatic layers, which are
-available online.
+available online. NOTE: some data will be available uppon publishing of
+the article.
 
 ## Interactive results
 
@@ -29,8 +30,8 @@ layers
 — **crop\_layers**: Bio-ORACLE layers cropped to the extent of the
 study  
 — **proj\_layers**: future scenarios layers — Other files used in
-processing environmental data (auxiliary). – **muhi**: *Mussismilia
-hispida* data  
+processing environmental data (auxiliary).  
+– **muhi**: *Mussismilia hispida* data  
 – **moca**: *Montastraea cavernosa* data  
 – **side**: *Siderastrea* data  
 – **thinning**: files produced in the thinning procedure (presence
