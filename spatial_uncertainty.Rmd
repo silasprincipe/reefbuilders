@@ -1,0 +1,306 @@
+---
+title: "Spatial uncertainty of models - Bootstrap"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+---
+
+# Spatial uncertainty of models obtained through a Bootstrap technique
+
+We assessed the spatial uncertainty through a bootstrap approach (presence/pseudo-absence data is sampled with replacement 100 times and new models are produced), using two metrics applied in different contexts. The first one was the coefficient of variation (CV). In this case we divide the standard deviation by the mean from the results of the raw models (i.e., non binary). Higher values occurs in areas where there is higher variability between models predictions and thus there is more uncertainty. The second metric is the "unalikeability" (more details on the metric, also called u2, are on the Material and Methods section). In this case, for each bootstrap realization we generate the ensembles using the committee average approach and then convert predictions to binary predictions. Then, we calculate the "unalikeability" for each cell based on the proportion of outcomes (i.e., 0 and 1s) of the 100 model realizations. This metric implicitly shows how much the outcomes varied when changing the original data, ranging from 0 to 0.5, being 0 just the cells where all outcomes were the same, and 0.5 the cell where 50% of the models returned one outcome and 50% the other. In our case, no species or scenarios had "unalikeability" values higher than 0.3.  
+
+## _Mussismilia hispida_
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+library(raster)
+library(leaflet)
+library(leaflet.extras)
+
+layers <- list()
+pallist <- list()
+
+files <- c("maps/muhi_boot/muhi_curens_variability.tif",
+           "maps/muhi_boot/muhi_26rcpens_variability.tif",
+           "maps/muhi_boot/muhi_45rcpens_variability.tif",
+           "maps/muhi_boot/muhi_85rcpens_variability.tif",
+           "maps/muhi_boot/muhi_current_cv.tif",
+           "maps/muhi_boot/muhi_rcp26_cv.tif",
+           "maps/muhi_boot/muhi_rcp45_cv.tif",
+           "maps/muhi_boot/muhi_rcp85_cv.tif")
+
+for (i in 1:length(files)) {
+  
+  r <- raster(files[i])
+  
+  r <- projectRaster(r, 
+                    crs = "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs", method = 'bilinear')
+  
+  if (i == 2) {
+    r <- r * 100
+  }
+  
+  layers[[i]] <- r
+  
+  pal <- colorNumeric(palette = "plasma", values(r),
+  na.color = "transparent")
+  
+  pallist[[i]] <- pal
+  
+}
+  
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+leaflet() %>%
+  # Base groups
+  addProviderTiles(providers$Esri.OceanBasemap, group = "Esri Ocean") %>%
+  addProviderTiles(providers$CartoDB.Positron, group = "CartoDB") %>%
+  addProviderTiles(providers$CartoDB.DarkMatter, group = "CartoDB Dark") %>%
+  # Overlay groups
+  addRasterImage(layers[[1]], colors = pallist[[1]], opacity = 1, group = "Current Unalikeability", project = F) %>%
+  addLegend(pal = pallist[[1]], values = values(layers[[1]]),
+            title = "Unalikeability", opacity = 1, group = "Current Unalikeability")%>%
+  addRasterImage(layers[[2]], colors = pallist[[2]], opacity = 1, group = "RCP 2.6 Unalikeability", project = F) %>%
+  addLegend(pal = pallist[[2]], values = values(layers[[2]]),
+            title = "Unalikeability", opacity = 1, group = "RCP 2.6 Unalikeability")%>%
+  addRasterImage(layers[[3]], colors = pallist[[3]], opacity = 1, group = "RCP 4.5 Unalikeability", project = F) %>%
+  addLegend(pal = pallist[[3]], values = values(layers[[3]]),
+            title = "Unalikeability", opacity = 1, group = "RCP 4.5 Unalikeability")%>%
+  addRasterImage(layers[[4]], colors = pallist[[4]], opacity = 1, group = "RCP 8.5 Unalikeability", project = F) %>%
+  addLegend(pal = pallist[[4]], values = values(layers[[4]]),
+            title = "Unalikeability", opacity = 1, group = "RCP 8.5 Unalikeability")%>%
+  addRasterImage(layers[[5]], colors = pallist[[5]], opacity = 1, group = "Current Coefficient of Variation", project = F) %>%
+  addLegend(pal = pallist[[5]], values = values(layers[[5]]),
+            title = "CV", opacity = 1, group = "Current Coefficient of Variation")%>%
+  addRasterImage(layers[[6]], colors = pallist[[6]], opacity = 1, group = "RCP 2.6 CV", project = F) %>%
+  addLegend(pal = pallist[[6]], values = values(layers[[6]]),
+            title = "CV", opacity = 1, group = "RCP 2.6 CV")%>%
+  addRasterImage(layers[[7]], colors = pallist[[7]], opacity = 1, group = "RCP 4.5 CV", project = F) %>%
+  addLegend(pal = pallist[[7]], values = values(layers[[7]]),
+            title = "CV", opacity = 1, group = "RCP 4.5 CV")%>%
+  addRasterImage(layers[[8]], colors = pallist[[8]], opacity = 1, group = "RCP 8.5 CV", project = F) %>%
+  addLegend(pal = pallist[[8]], values = values(layers[[8]]),
+            title = "CV", opacity = 1, group = "RCP 8.5 CV")%>%
+  # Layers control
+  addLayersControl(
+    baseGroups = c("Esri Ocean", "CartoDB", "CartoDB Dark"),
+    overlayGroups = c("Current Unalikeability",
+                      "RCP 2.6 Unalikeability",
+                      "RCP 4.5 Unalikeability",
+                      "RCP 8.5 Unalikeability",
+                      "Current Coefficient of Variation",
+                      "RCP 2.6 CV",
+                      "RCP 4.5 CV",
+                      "RCP 8.5 CV"),
+    options = layersControlOptions(collapsed = T),
+    position = "bottomright"
+  )%>%hideGroup(c("RCP 2.6 Unalikeability",
+                      "RCP 4.5 Unalikeability",
+                      "RCP 8.5 Unalikeability",
+                      "Current Coefficient of Variation",
+                      "RCP 2.6 CV",
+                      "RCP 4.5 CV",
+                      "RCP 8.5 CV"))%>%
+        addFullscreenControl()
+
+```
+
+## _Montastraea cavernosa_
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+library(raster)
+library(leaflet)
+library(leaflet.extras)
+
+layers <- list()
+pallist <- list()
+
+files <- c("maps/moca_boot/moca_curens_variability.tif",
+           "maps/moca_boot/moca_26rcpens_variability.tif",
+           "maps/moca_boot/moca_45rcpens_variability.tif",
+           "maps/moca_boot/moca_85rcpens_variability.tif",
+           "maps/moca_boot/moca_current_cv.tif",
+           "maps/moca_boot/moca_rcp26_cv.tif",
+           "maps/moca_boot/moca_rcp45_cv.tif",
+           "maps/moca_boot/moca_rcp85_cv.tif")
+
+for (i in 1:length(files)) {
+  
+  r <- raster(files[i])
+  
+  r <- projectRaster(r, 
+                    crs = "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs", method = 'bilinear')
+  
+  if (i == 2) {
+    r <- r * 100
+  }
+  
+  layers[[i]] <- r
+  
+  pal <- colorNumeric(palette = "plasma", values(r),
+  na.color = "transparent")
+  
+  pallist[[i]] <- pal
+  
+}
+  
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+leaflet() %>%
+  # Base groups
+  addProviderTiles(providers$Esri.OceanBasemap, group = "Esri Ocean") %>%
+  addProviderTiles(providers$CartoDB.Positron, group = "CartoDB") %>%
+  addProviderTiles(providers$CartoDB.DarkMatter, group = "CartoDB Dark") %>%
+  # Overlay groups
+  addRasterImage(layers[[1]], colors = pallist[[1]], opacity = 1, group = "Current Unalikeability", project = F) %>%
+  addLegend(pal = pallist[[1]], values = values(layers[[1]]),
+            title = "Unalikeability", opacity = 1, group = "Current Unalikeability")%>%
+  addRasterImage(layers[[2]], colors = pallist[[2]], opacity = 1, group = "RCP 2.6 Unalikeability", project = F) %>%
+  addLegend(pal = pallist[[2]], values = values(layers[[2]]),
+            title = "Unalikeability", opacity = 1, group = "RCP 2.6 Unalikeability")%>%
+  addRasterImage(layers[[3]], colors = pallist[[3]], opacity = 1, group = "RCP 4.5 Unalikeability", project = F) %>%
+  addLegend(pal = pallist[[3]], values = values(layers[[3]]),
+            title = "Unalikeability", opacity = 1, group = "RCP 4.5 Unalikeability")%>%
+  addRasterImage(layers[[4]], colors = pallist[[4]], opacity = 1, group = "RCP 8.5 Unalikeability", project = F) %>%
+  addLegend(pal = pallist[[4]], values = values(layers[[4]]),
+            title = "Unalikeability", opacity = 1, group = "RCP 8.5 Unalikeability")%>%
+  addRasterImage(layers[[5]], colors = pallist[[5]], opacity = 1, group = "Current Coefficient of Variation", project = F) %>%
+  addLegend(pal = pallist[[5]], values = values(layers[[5]]),
+            title = "CV", opacity = 1, group = "Current Coefficient of Variation")%>%
+  addRasterImage(layers[[6]], colors = pallist[[6]], opacity = 1, group = "RCP 2.6 CV", project = F) %>%
+  addLegend(pal = pallist[[6]], values = values(layers[[6]]),
+            title = "CV", opacity = 1, group = "RCP 2.6 CV")%>%
+  addRasterImage(layers[[7]], colors = pallist[[7]], opacity = 1, group = "RCP 4.5 CV", project = F) %>%
+  addLegend(pal = pallist[[7]], values = values(layers[[7]]),
+            title = "CV", opacity = 1, group = "RCP 4.5 CV")%>%
+  addRasterImage(layers[[8]], colors = pallist[[8]], opacity = 1, group = "RCP 8.5 CV", project = F) %>%
+  addLegend(pal = pallist[[8]], values = values(layers[[8]]),
+            title = "CV", opacity = 1, group = "RCP 8.5 CV")%>%
+  # Layers control
+  addLayersControl(
+    baseGroups = c("Esri Ocean", "CartoDB", "CartoDB Dark"),
+    overlayGroups = c("Current Unalikeability",
+                      "RCP 2.6 Unalikeability",
+                      "RCP 4.5 Unalikeability",
+                      "RCP 8.5 Unalikeability",
+                      "Current Coefficient of Variation",
+                      "RCP 2.6 CV",
+                      "RCP 4.5 CV",
+                      "RCP 8.5 CV"),
+    options = layersControlOptions(collapsed = T),
+    position = "bottomright"
+  )%>%hideGroup(c("RCP 2.6 Unalikeability",
+                      "RCP 4.5 Unalikeability",
+                      "RCP 8.5 Unalikeability",
+                      "Current Coefficient of Variation",
+                      "RCP 2.6 CV",
+                      "RCP 4.5 CV",
+                      "RCP 8.5 CV"))%>%
+        addFullscreenControl()
+
+```
+
+## _Siderastrea_
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+
+library(raster)
+library(leaflet)
+library(leaflet.extras)
+
+layers <- list()
+pallist <- list()
+
+files <- c("maps/side_boot/side_curens_variability.tif",
+           "maps/side_boot/side_26rcpens_variability.tif",
+           "maps/side_boot/side_45rcpens_variability.tif",
+           "maps/side_boot/side_85rcpens_variability.tif",
+           "maps/side_boot/side_current_cv.tif",
+           "maps/side_boot/side_rcp26_cv.tif",
+           "maps/side_boot/side_rcp45_cv.tif",
+           "maps/side_boot/side_rcp85_cv.tif")
+
+for (i in 1:length(files)) {
+  
+  r <- raster(files[i])
+  
+  r <- projectRaster(r, 
+                    crs = "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs", method = 'bilinear')
+  
+  if (i == 2) {
+    r <- r * 100
+  }
+  
+  layers[[i]] <- r
+  
+  pal <- colorNumeric(palette = "plasma", values(r),
+  na.color = "transparent")
+  
+  pallist[[i]] <- pal
+  
+}
+  
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+leaflet() %>%
+  # Base groups
+  addProviderTiles(providers$Esri.OceanBasemap, group = "Esri Ocean") %>%
+  addProviderTiles(providers$CartoDB.Positron, group = "CartoDB") %>%
+  addProviderTiles(providers$CartoDB.DarkMatter, group = "CartoDB Dark") %>%
+  # Overlay groups
+  addRasterImage(layers[[1]], colors = pallist[[1]], opacity = 1, group = "Current Unalikeability", project = F) %>%
+  addLegend(pal = pallist[[1]], values = values(layers[[1]]),
+            title = "Unalikeability", opacity = 1, group = "Current Unalikeability")%>%
+  addRasterImage(layers[[2]], colors = pallist[[2]], opacity = 1, group = "RCP 2.6 Unalikeability", project = F) %>%
+  addLegend(pal = pallist[[2]], values = values(layers[[2]]),
+            title = "Unalikeability", opacity = 1, group = "RCP 2.6 Unalikeability")%>%
+  addRasterImage(layers[[3]], colors = pallist[[3]], opacity = 1, group = "RCP 4.5 Unalikeability", project = F) %>%
+  addLegend(pal = pallist[[3]], values = values(layers[[3]]),
+            title = "Unalikeability", opacity = 1, group = "RCP 4.5 Unalikeability")%>%
+  addRasterImage(layers[[4]], colors = pallist[[4]], opacity = 1, group = "RCP 8.5 Unalikeability", project = F) %>%
+  addLegend(pal = pallist[[4]], values = values(layers[[4]]),
+            title = "Unalikeability", opacity = 1, group = "RCP 8.5 Unalikeability")%>%
+  addRasterImage(layers[[5]], colors = pallist[[5]], opacity = 1, group = "Current Coefficient of Variation", project = F) %>%
+  addLegend(pal = pallist[[5]], values = values(layers[[5]]),
+            title = "CV", opacity = 1, group = "Current Coefficient of Variation")%>%
+  addRasterImage(layers[[6]], colors = pallist[[6]], opacity = 1, group = "RCP 2.6 CV", project = F) %>%
+  addLegend(pal = pallist[[6]], values = values(layers[[6]]),
+            title = "CV", opacity = 1, group = "RCP 2.6 CV")%>%
+  addRasterImage(layers[[7]], colors = pallist[[7]], opacity = 1, group = "RCP 4.5 CV", project = F) %>%
+  addLegend(pal = pallist[[7]], values = values(layers[[7]]),
+            title = "CV", opacity = 1, group = "RCP 4.5 CV")%>%
+  addRasterImage(layers[[8]], colors = pallist[[8]], opacity = 1, group = "RCP 8.5 CV", project = F) %>%
+  addLegend(pal = pallist[[8]], values = values(layers[[8]]),
+            title = "CV", opacity = 1, group = "RCP 8.5 CV")%>%
+  # Layers control
+  addLayersControl(
+    baseGroups = c("Esri Ocean", "CartoDB", "CartoDB Dark"),
+    overlayGroups = c("Current Unalikeability",
+                      "RCP 2.6 Unalikeability",
+                      "RCP 4.5 Unalikeability",
+                      "RCP 8.5 Unalikeability",
+                      "Current Coefficient of Variation",
+                      "RCP 2.6 CV",
+                      "RCP 4.5 CV",
+                      "RCP 8.5 CV"),
+    options = layersControlOptions(collapsed = T),
+    position = "bottomright"
+  )%>%hideGroup(c("RCP 2.6 Unalikeability",
+                      "RCP 4.5 Unalikeability",
+                      "RCP 8.5 Unalikeability",
+                      "Current Coefficient of Variation",
+                      "RCP 2.6 CV",
+                      "RCP 4.5 CV",
+                      "RCP 8.5 CV"))%>%
+        addFullscreenControl()
+
+```

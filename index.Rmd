@@ -1,13 +1,15 @@
 ---
-title:
+title: Climate change effects on reef builder corals
 output:
   html_document:
     includes:
       in_header: hero-image.html
 ---
 
-Hello, Website!
+In terrestrial and aquatic ecosystems several species provide structural complexity to the environment ^[e.g. Graham, N. A. J., and Nash, K. L. (2013). The importance of structural complexity in coral reef ecosystems. Coral Reefs 32, 315–326. doi:10.1007/s00338-012-0984-y.]. By creating three dimensional space these species provides shelter, increases niche availability and can provide resources for other organisms ^[Jones, C. G., Lawron, J. H., and Shachak, M. (1997). Positive and negative effects of organisms as physical ecosystem engineers. Ecology 78, 1946–1957. doi:10.1890/0012-9658(1997)078[1946:PANEOO]2.0.CO;2.] ^[Jones, C. G., Lawton, J. H., Shachak, M., and Organisms, M. (1994). Organisms as Ecosystem Engineers. Oikos 69, 373–386.]. In coral reefs, Scleractinian corals plays a key role as habitat forming species ^[e.g. Alvarez-Filip, L., Gill, J. A., and Dulvy, N. K. (2011b). Complex reef architecture supports more small-bodied fishes and longer food chains on Caribbean reefs. Ecosphere 2, art118. doi:10.1890/es11-00185.1.]. Reduction in its abundance can potentially lead to the loss of diversity in the ecosystem ^[Richardson, L. E., Graham, N. A. J., and Hoey, A. S. (2020). Coral species composition drives key ecosystem function on coral reefs. Proc. R. Soc. B Biol. Sci. 287, 20192214. doi:10.1098/rspb.2019.2214.]. Thus, understanding the possible changes in the distribution of reef builders is an important task to understand how climate change may affect coral reefs and also to propose conservation actions to ensures coral reefs persistence in the future.  
 
-For more information about simple R Markdown websites, please read the documentation at https://bookdown.org/yihui/rmarkdown/rmarkdown-site.html.
+Here, we provide an interactive version of the results section of our work "Predicted shifts in the distribution of Atlantic reef building corals in face of climate change", under consideration for publishing in Frontiers in Marine Sciences (Open Access), where we projected the current and future distribution  (in three RCP scenarios) of three key reef builder corals of the Atlantic. This work was authored by Silas C. Principe, André L. Acosta, João Espíndola and Tito Lotufo and is part of a major project designed to understand the impacts of climate change on key species of shallow reefs of the Atlantic.  
 
-Please also note that simple R Markdown sites are _not_ based on **blogdown**. They are probably good for websites with only a few Rmd documents. For larger-scale and more sophisticated websites (such as blogs), you may want to use **blogdown** instead: https://github.com/rstudio/blogdown.
+In the *Summary* section we provide details on the methods used to produce this work. On the *Results* menu you will find links to the maps produced for the current and future periods. An important note: due to specifications of the ``leaflet`` package (used to produce the interactive maps), some differences may be evident as the original images are not projected (lonlat) and the ones here are (EPSG:3857).  
+
+All the original codes and data are available on the GitHub link provided. Please, feel free to e-mail us if you have any question: silasprincipe@usp.br.

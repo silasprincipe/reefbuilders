@@ -11,9 +11,9 @@
 
 
 
-<title>index.utf8</title>
+<title>Climate change effects on reef builder corals</title>
 
-<script src="site_libs/header-attrs-2.1/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.6/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -25,12 +25,22 @@
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+<link href="site_libs/ionicons-2.0.1/css/ionicons.min.css" rel="stylesheet" />
 <div class="hero-image"> 
         <div class="image-text">
           <div class="top-text">Interactive results</div>
             <div class="bottom-text">Climate change effects on Atlantic reef builders.</div>
         </div>
 </div>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -76,6 +86,7 @@ h6 {
   text-align: left;
 }
 </style>
+
 
 <link rel="stylesheet" href="styles.css" type="text/css" />
 
@@ -289,7 +300,7 @@ $(document).ready(function () {
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    <span class="fa fa-chart-area"></span>
+    <span class="fas fa-chart-area"></span>
      
     Results
      
@@ -320,13 +331,16 @@ $(document).ready(function () {
     <li>
       <a href="climate_layers.html">Climate layers</a>
     </li>
+    <li>
+      <a href="spatial_uncertainty.html">Spatial uncertainty</a>
+    </li>
   </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/silasprincipe/reefbuilders">
-    <span class="fa fa-github"></span>
+    <span class="ion ion-social-github"></span>
      
     Download source data
   </a>
@@ -340,13 +354,25 @@ $(document).ready(function () {
 
 
 
+<h1 class="title toc-ignore">Climate change effects on reef builder corals</h1>
 
 </div>
 
 
-<p>Hello, Website!</p>
-<p>For more information about simple R Markdown websites, please read the documentation at <a href="https://bookdown.org/yihui/rmarkdown/rmarkdown-site.html" class="uri">https://bookdown.org/yihui/rmarkdown/rmarkdown-site.html</a>.</p>
-<p>Please also note that simple R Markdown sites are <em>not</em> based on <strong>blogdown</strong>. They are probably good for websites with only a few Rmd documents. For larger-scale and more sophisticated websites (such as blogs), you may want to use <strong>blogdown</strong> instead: <a href="https://github.com/rstudio/blogdown" class="uri">https://github.com/rstudio/blogdown</a>.</p>
+<p>In terrestrial and aquatic ecosystems several species provide structural complexity to the environment <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>. By creating three dimensional space these species provides shelter, increases niche availability and can provide resources for other organisms <a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> <a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>. In coral reefs, Scleractinian corals plays a key role as habitat forming species <a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>. Reduction in its abundance can potentially lead to the loss of diversity in the ecosystem <a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>. Thus, understanding the possible changes in the distribution of reef builders is an important task to understand how climate change may affect coral reefs and also to propose conservation actions to ensures coral reefs persistence in the future.</p>
+<p>Here, we provide an interactive version of the results section of our work “Predicted shifts in the distribution of Atlantic reef building corals in face of climate change”, under consideration for publishing in Frontiers in Marine Sciences (Open Access), where we projected the current and future distribution (in three RCP scenarios) of three key reef builder corals of the Atlantic. This work was authored by Silas C. Principe, André L. Acosta, João Espíndola and Tito Lotufo and is part of a major project designed to understand the impacts of climate change on key species of shallow reefs of the Atlantic.</p>
+<p>In the <em>Summary</em> section we provide details on the methods used to produce this work. On the <em>Results</em> menu you will find links to the maps produced for the current and future periods. An important note: due to specifications of the <code>leaflet</code> package (used to produce the interactive maps), some differences may be evident as the original images are not projected (lonlat) and the ones here are (EPSG:3857).</p>
+<p>All the original codes and data are available on the GitHub link provided. Please, feel free to e-mail us if you have any question: <a href="mailto:silasprincipe@usp.br" class="email">silasprincipe@usp.br</a>.</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>e.g. Graham, N. A. J., and Nash, K. L. (2013). The importance of structural complexity in coral reef ecosystems. Coral Reefs 32, 315–326. <a href="doi:10.1007/s00338-012-0984-y" class="uri">doi:10.1007/s00338-012-0984-y</a>.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Jones, C. G., Lawron, J. H., and Shachak, M. (1997). Positive and negative effects of organisms as physical ecosystem engineers. Ecology 78, 1946–1957. <a href="doi:10.1890/0012-9658(1997)078%5B1946:PANEOO%5D2.0.CO;2" class="uri">doi:10.1890/0012-9658(1997)078[1946:PANEOO]2.0.CO;2</a>.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>Jones, C. G., Lawton, J. H., Shachak, M., and Organisms, M. (1994). Organisms as Ecosystem Engineers. Oikos 69, 373–386.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+<li id="fn4"><p>e.g. Alvarez-Filip, L., Gill, J. A., and Dulvy, N. K. (2011b). Complex reef architecture supports more small-bodied fishes and longer food chains on Caribbean reefs. Ecosphere 2, art118. <a href="doi:10.1890/es11-00185.1" class="uri">doi:10.1890/es11-00185.1</a>.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
+<li id="fn5"><p>Richardson, L. E., Graham, N. A. J., and Hoey, A. S. (2020). Coral species composition drives key ecosystem function on coral reefs. Proc. R. Soc. B Biol. Sci. 287, 20192214. <a href="doi:10.1098/rspb.2019.2214" class="uri">doi:10.1098/rspb.2019.2214</a>.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
 
 <p>Silas C. Principe, 2020. Proudly created using R Markdown.</p>
 
@@ -358,7 +384,7 @@ $(document).ready(function () {
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();

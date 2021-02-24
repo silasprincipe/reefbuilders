@@ -1,5 +1,5 @@
 ---
-title: "Composition of suitable niche - RCP 2.6"
+title: "Composition of suitable habitat - RCP 2.6"
 output:
   html_document:
     toc: true
@@ -15,6 +15,7 @@ output:
 
 library(raster)
 library(leaflet)
+library(leaflet.extras)
 
 r <- raster("maps/rcp26_composition_change.tif")
 
@@ -27,8 +28,8 @@ r2 <- raster::asFactor(r2)
 
 #0 is unsuitable area, 1 area that was lost, 2 area that gained, 3 kept area
 
-pal <- colorFactor(c("#fb7d06", "#f3b70d", "#F9FF07","#2c3e50",
-                     "#07FFEC","#3CB68C","#158349"), 
+pal <- colorFactor(c("#fa5f05", "#f3b70d", "#fcff2d","#2c3e50",
+                     "#b0f4ef","#44eab0","#0a7b4e"), 
                 levels = c(-3, -2, -1, 0, 1, 2, 3), na.color = NA)
 ```
 
@@ -51,7 +52,8 @@ leaflet() %>%
     overlayGroups = c("Projection"),
     options = layersControlOptions(collapsed = T),
     position = "bottomright"
-  )
+  )%>%
+        addFullscreenControl()
 
 ```
 
@@ -149,6 +151,7 @@ leaflet() %>%
     options = layersControlOptions(collapsed = T),
     position = "bottomright"
   )%>%
-  hideGroup("Current")
+  hideGroup("Current")%>%
+        addFullscreenControl()
 
 ```

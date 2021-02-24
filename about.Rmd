@@ -1,5 +1,5 @@
 ---
-title: 
+title: Summary
 output:
   html_document:
     toc: true
@@ -7,29 +7,25 @@ output:
     toc_float: true
 ---
 
-```{r eval=FALSE, include=FALSE}
-pal <- colorNumeric(c("#0C2C84", "#41B6C4", "#FFFFCC"), values(r.env),
-  na.color = "transparent")
+# Species of reef builders  
 
-leaflet() %>%
-  # Base groups
-  addTiles(group = "OSM (default)") %>%
-  addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
-  addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>%
-  # Overlay groups
-  addMarkers(data = pts,
-    clusterOptions = markerClusterOptions(),
-    group = "Presence points"
-  ) %>%
-  addRasterImage(r.env, colors = pal, opacity = 0.9, group = "Temperature") %>%
-  addLegend(pal = pal, values = values(r.env),
-    title = "Surface temp", position = "bottomright", group = "Temperature") %>%
-  # Layers control
-  addLayersControl(
-    baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
-    overlayGroups = c("Presence points", "Temperature"),
-    options = layersControlOptions(collapsed = T)
-  )
+Three species were selected: _Mussismilia hispida_, _Montastraea cavernosa_ and _Siderastrea_ complex. The last comprises two species that co-occur and are hard to distinguish on field conditions: _Siderastrea radians_ and _Siderastrea stellata_. Due to these characteristics both species were modelled as a single entity. Data on presence of species was obtained through a bibliographic search and from the GBIF (Global Biodiversity Facility) and OBIS (Ocean Biodiversity Information System) databases.  
 
-```
+# Area of study  
+
+Current and future distribution of the three reefbuilders were obtained for the western and eastern Atlantic Ocean, from latitudes of -42.5° to 42.5 and altitude of 2 to the depth of 200 m.  
+
+# Modelling procedure  
+
+We used an ensemble multi-modelling approach using four different algorithms (Random Forest, Generalized Linear Model, Generalized Additive Model and Boosted Regression Trees). For each species, we modelled the species distribution with the different algorithms. Model performance was assessed through a block-cross validation procedure. Models that scored above a certain metric threshold were then used to create the final ensemble. We used the comitee averaging method for the ensemble in which individual models are first binarized (using a threshold value) and then summed. Thus, considering that we summed 4 ensembles, values of the ensemble will range from 0 to 4, being 4 the value of a cell in which all the models agreed with the presence. We then binarized the ensemble models using as a threshold the value where three out of the four models agreed with the prediction.  
+
+Models were projected for the current and future (2100) period for three different RCP (Relative Concentration Pathways) scenarios (RCP 2.6, RCP 4.5 and RCP 8.5).  
+
+------
+
+More details can be found in the original article (under consideration for publishing).  
+
+------
+
+  
 

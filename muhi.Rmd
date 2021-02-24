@@ -7,13 +7,15 @@ output:
     toc_float: true
 ---
 
-# Current and future projections of *Mussismilia hispida* niche
+# Current and future projections of *Mussismilia hispida* suitable areas
 
-## Current ecological niche
+## Current habitat suitability
 
 ```{r message=FALSE, warning=FALSE, include=FALSE}
 library(leaflet)
 library(raster)
+library(leaflet.extras)
+
 
 r <- raster("maps/muhi_current.tif")
 
@@ -27,8 +29,10 @@ pts <- SpatialPoints(pts, proj4string = CRS("+proj=longlat +datum=WGS84 +no_defs
 r2 <- projectRaster(r, 
                     crs = "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs", method = "ngb")
 
+r2 <- asFactor(r2)
 
-binpal <- colorBin(c("#2c3e50","#00DBC7"), c(0,1),na.color = NA, 2, pretty = FALSE)
+
+binpal <- colorFactor(c("#2c3e50","#00DBC7"), levels = c(0,1), na.color = NA)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -52,7 +56,8 @@ leaflet() %>%
     overlayGroups = c("Presence points", "Suitability projection"),
     options = layersControlOptions(collapsed = T),
     position = "bottomright"
-  )
+  )%>%
+        addFullscreenControl()
 
 ```
 
@@ -95,7 +100,8 @@ leaflet() %>%
     options = layersControlOptions(collapsed = T),
     position = "bottomright"
   )%>%
-  hideGroup("Presence points")
+  hideGroup("Presence points")%>%
+        addFullscreenControl()
 
 ```
 
@@ -137,7 +143,8 @@ leaflet() %>%
     options = layersControlOptions(collapsed = T),
     position = "bottomright"
   )%>%
-  hideGroup("Presence points")
+  hideGroup("Presence points")%>%
+        addFullscreenControl()
 
 ```
 
@@ -179,6 +186,7 @@ leaflet() %>%
     options = layersControlOptions(collapsed = T),
     position = "bottomright"
   )%>%
-  hideGroup("Presence points")
+  hideGroup("Presence points")%>%
+        addFullscreenControl()
 
 ```

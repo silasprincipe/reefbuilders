@@ -27,9 +27,11 @@ navbar:
         - text: "Support data"
         - text: "Climate layers"
           href: climate_layers.html
+        - text: "Spatial uncertainty"
+          href: spatial_uncertainty.html
   right:
     - text: "Download source data"
-      icon: fa-github
+      icon: ion-social-github
       href: https://github.com/silasprincipe/reefbuilders
 output:
   html_document:
