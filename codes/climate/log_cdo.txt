@@ -1,0 +1,193 @@
+  470  cd /cygdrive/c/pesquisa/modelagem/climate_layers
+  471  PATH="$PATH:.:"
+  472  do sinfon clt_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc
+  473  cdo sinfon clt_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc
+  474  cdo mergetime calc_Omon_IPSL-CM5A-LR_historical_r1i1p1_195001-200512.nc calc_Omon_IPSL-CM5A-LR_rcp26_r1i1p1_200601-210512.nc calc_hist_26.nc
+  475  cdo sinfon calc_hist_26.nc
+  476  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2000/2014 calc_hist_26.nc calc_26_base.nc
+  477  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2090/2100 calc_hist_26.nc calc_26_fut.nc
+  478  cdo sub calc_26_fut.nc calc_26_base.nc calc_26_f100.nc
+  479  cdo mergetime calc_Omon_IPSL-CM5A-LR_historical_r1i1p1_195001-200512.nc calc_Omon_IPSL-CM5A-LR_rcp45_r1i1p1_200601-210512.nc calc_hist_45.nc
+  480  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2000/2014 calc_hist_45.nc calc_45_base.nc
+  481  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2090/2100 calc_hist_45.nc calc_45_fut.nc
+  482  cdo sub calc_45_fut.nc calc_45_base.nc calc_45_f100.nc
+  483  cdo mergetime calc_Omon_IPSL-CM5A-LR_historical_r1i1p1_195001-200512.nc calc_Omon_IPSL-CM5A-LR_rcp85_r1i1p1_200601-210512.nc calc_hist_85.nc
+  484  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2000/2014 calc_hist_85.nc calc_85_base.nc
+  485  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2090/2100 calc_hist_85.nc calc_85_fut.nc
+  486  cdo sub calc_85_fut.nc calc_85_base.nc calc_85_f100.nc
+  487  cdo mergetime chl_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc chl_Omon_HadGEM2-ES_rcp26_r1i1p1_200512-209911.nc chl_Omon_HadGEM2-ES_rcp26_r1i1p1_209912-219911.nc chl_hist_26.nc
+  488  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2000/2014 chl_hist_26.nc chl_26_base.nc
+  489  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2090/2100 chl_hist_26.nc chl_26_fut.nc
+  490  cdo sub chl_26_fut.nc chl_26_base.nc chl_26_f100.nc
+  491  cdo mergetime chl_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc chl_Omon_HadGEM2-ES_rcp45_r1i1p1_200512-209911.nc chl_Omon_HadGEM2-ES_rcp45_r1i1p1_209912-219911.nc chl_hist_45.nc
+  492* cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2000/2014 chl_hist_45.nc chl_45_base.nc
+  493  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2090/2100 chl_hist_45.nc chl_45_fut.nc
+  494  cdo sub chl_45_fut.nc chl_45_base.nc chl_45_f100.nc
+  495  cdo sinfon chl_45_f100.nc
+  496  cdo mergetime chl_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc chl_Omon_HadGEM2-ES_rcp85_r1i1p1_200512-209911.nc chl_Omon_HadGEM2-ES_rcp85_r1i1p1_209912-219911.nc chl_hist_85.nc
+  497  cdo mergetime chl_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc chl_Omon_HadGEM2-ES_rcp85_r1i1p1_200512-209912.nc chl_Omon_HadGEM2-ES_rcp85_r1i1p1_209912-219911.nc chl_hist_85.nc
+  498  cdo infon chl_hist_85.nc
+  499  cdo -mergetime chl_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc chl_Omon_HadGEM2-ES_rcp85_r1i1p1_200512-209912.nc -selyear,2100/2199 chl_Omon_HadGEM2-ES_rcp85_r1i1p1_209912-219911.nc chl_hist_85.nc
+  500  cdo infon chl_hist_85.nc
+  501  cd /cygdrive/c/pesquisa/modelagem/climate_layers
+  502  PATH="$PATH:.:"
+  503  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2000/2014 chl_hist_85.nc chl_85_base.nc
+  504  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2090/2100 chl_hist_85.nc chl_85_fut.nc
+  505  cdo sub chl_85_fut.nc chl_85_base.nc chl_85_f100.nc
+  506  history
+  501  cd /cygdrive/c/pesquisa/modelagem/climate_layers
+  502  PATH="$PATH:.:"
+  503  cdo mergetime clt_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc clt_Amon_HadGEM2-ES_rcp26_r1i1p1_200512-203011.nc clt_hist_26.nc
+  504  cdo mergetime clt_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc clt_Amon_HadGEM2-ES_rcp45_r1i1p1_200512-203011.nc clt_hist_45.nc
+  505  cdo mergetime clt_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc clt_Amon_HadGEM2-ES_rcp85_r1i1p1_200512-203011.nc clt_hist_85.nc
+  506  cdo mergetime clt_Amon_HadGEM2-ES_rcp26_r1i1p1_208012-209911.nc clt_Amon_HadGEM2-ES_rcp26_r1i1p1_209912-212411.nc clt_rcp26.nc
+  507  cdo mergetime clt_Amon_HadGEM2-ES_rcp45_r1i1p1_208012-209911.nc clt_Amon_HadGEM2-ES_rcp45_r1i1p1_209912-212411.nc clt_rcp45.nc
+  508  cdo mergetime clt_Amon_HadGEM2-ES_rcp85_r1i1p1_208012-209912.nc -selyear,2100/2124 clt_Amon_HadGEM2-ES_rcp85_r1i1p1_209912-212411.nc clt_rcp85.nc
+  509  cdo infon clt_rcp85.nc
+  510  cdo sinfon clt_rcp85.nc
+  511  cdo sinfon clt_Amon_HadGEM2-ES_rcp85_r1i1p1_209912-212411.nc
+  512  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2000/2014 clt_hist_26.nc clt_26_base.nc
+  513  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2000/2014 clt_hist_45.nc clt_45_base.nc
+  514  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2000/2014 clt_hist_85.nc clt_85_base.nc
+  515  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2090/2100 clt_rcp26.nc clt_26_fut.nc
+  516  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2090/2100 clt_rcp45.nc clt_45_fut.nc
+  517  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2090/2100 clt_rcp85.nc clt_85_fut.nc
+  518  cdo sub clt_26_fut.nc clt_26_base.nc clt_26_f100.nc
+  519  cdo sub clt_45_fut.nc clt_45_base.nc clt_45_f100.nc
+  520  cdo sub clt_85_fut.nc clt_85_base.nc clt_85_f100.nc
+  521  cdo sinfon no3_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc
+  522  cdo mergetime no3_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc no3_Omon_HadGEM2-ES_rcp26_r1i1p1_200512-209911.nc no3_Omon_HadGEM2-ES_rcp26_r1i1p1_209912-219911.nc no3_hist_26.nc
+  523  cdo mergetime no3_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc no3_Omon_HadGEM2-ES_rcp45_r1i1p1_200512-209911.nc no3_Omon_HadGEM2-ES_rcp45_r1i1p1_209912-219911.nc no3_hist_26.nc
+  524  cdo mergetime no3_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc no3_Omon_HadGEM2-ES_rcp45_r1i1p1_200512-209911.nc no3_Omon_HadGEM2-ES_rcp45_r1i1p1_209912-219911.nc no3_hist_45.nc
+  525  cdo mergetime no3_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc no3_Omon_HadGEM2-ES_rcp85_r1i1p1_200512-209911.nc no3_Omon_HadGEM2-ES_rcp85_r1i1p1_209912-219911.nc no3_hist_85.nc
+  526  cdo mergetime no3_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc no3_Omon_HadGEM2-ES_rcp85_r1i1p1_200512-209911.nc -selyear,2100/2199 no3_Omon_HadGEM2-ES_rcp85_r1i1p1_209912-219911.nc no3_hist_85.nc
+  527  cdo mergetime no3_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc no3_Omon_HadGEM2-ES_rcp85_r1i1p1_200512-209912.nc -selyear,2100/2199 no3_Omon_HadGEM2-ES_rcp85_r1i1p1_209912-219911.nc no3_hist_85.nc
+  528  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2000/2014 no3_hist_26.nc no3_26_base.nc
+  529  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2000/2014 no3_hist_45.nc no3_45_base.nc
+  530  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2000/2014 no3_hist_85.nc no3_85_base.nc
+  531  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2090/2100 no3_hist_26.nc no3_26_fut.nc
+  532  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2090/2100 no3_hist_45.nc no3_45_fut.nc
+  533  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2090/2100 no3_hist_85.nc no3_85_fut.nc
+  534  cdo sub no3_26_fut.nc no3_26_base.nc no3_26_f100.nc
+  535  cdo sub no3_45_fut.nc no3_45_base.nc no3_45_f100.nc
+  536  cdo sub no3_85_fut.nc no3_85_base.nc no3_85_f100.nc
+  537  history
+  501  cd /cygdrive/c/pesquisa/modelagem/climate_layers
+  502  PATH="$PATH:.:"
+  503  cdo sinfon so_Omon_HadGEM2-ES_historical_r1i1p1_199912-200512.nc
+  504  cdo mergetime -sellevel,5 so_Omon_HadGEM2-ES_historical_r1i1p1_199912-200512.nc so_Omon_HadGEM2-ES_rcp26_r1i1p1_200512-201511.nc so_hist_26.nc
+  505  cdo mergetime -sellevel,5 so_Omon_HadGEM2-ES_historical_r1i1p1_199912-200512.nc -sellevel,5 so_Omon_HadGEM2-ES_rcp26_r1i1p1_200512-201511.nc so_hist_26.nc
+  506  cdo sinfon so_hist_26.nc
+  507  cdo mergetime -sellevel,5 so_Omon_HadGEM2-ES_historical_r1i1p1_199912-200512.nc -sellevel,5 so_Omon_HadGEM2-ES_rcp45_r1i1p1_200512-201511.nc so_hist_45.nc
+  508  cdo mergetime -sellevel,5 so_Omon_HadGEM2-ES_historical_r1i1p1_199912-200512.nc -sellevel,5 so_Omon_HadGEM2-ES_rcp85_r1i1p1_200512-201511.nc so_hist_85.nc
+  509  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2000/2014 so_hist_26.nc so_26_base.nc
+  510  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2000/2014 so_hist_45.nc so_45_base.nc
+  511  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2000/2014 so_hist_85.nc so_85_base.nc
+  512  cdo mergetime -sellevel,5 so_Omon_HadGEM2-ES_rcp26_r1i1p1_208512-209511.nc -sellevel,5 so_Omon_HadGEM2-ES_rcp26_r1i1p1_209512-209911.nc -sellevel,5 so_Omon_HadGEM2-ES_rcp26_r1i1p1_209912-210911.nc so_26_fut.nc
+  513  rm so_26_fut.nc
+  514  cdo mergetime -sellevel,5 so_Omon_HadGEM2-ES_rcp26_r1i1p1_208512-209511.nc -sellevel,5 so_Omon_HadGEM2-ES_rcp26_r1i1p1_209512-209911.nc -sellevel,5 so_Omon_HadGEM2-ES_rcp26_r1i1p1_209912-210911.nc so_26.nc
+  515  cdo mergetime -sellevel,5 so_Omon_HadGEM2-ES_rcp45_r1i1p1_208512-209511.nc -sellevel,5 so_Omon_HadGEM2-ES_rcp45_r1i1p1_209512-209911.nc -sellevel,5 so_Omon_HadGEM2-ES_rcp45_r1i1p1_209912-210911.nc so_45.nc
+  516  cdo mergetime -sellevel,5 so_Omon_HadGEM2-ES_rcp85_r1i1p1_208512-209511.nc  -sellevel,5 so_Omon_HadGEM2-ES_rcp85_r1i1p1_209512-209912.nc -sellevel,5 -selyear,2100/2109 so_Omon_HadGEM2-ES_rcp85_r1i1p1_209912-210911.nc  so_85.nc
+  517  cdo sinfon so_85.nc
+  518  cdo infon so_85.nc
+  519  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2090/2100 so_26.nc so_26_fut.nc
+  520  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2090/2100 so_45.nc so_45_fut.nc
+  521  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2090/2100 so_85.nc so_85_fut.nc
+  522  cdo sub so_26_fut.nc so_26_base.nc so_26_f100.nc
+  523  cdo sub so_45_fut.nc so_45_base.nc so_45_f100.nc
+  524  cdo sub so_85_fut.nc so_85_base.nc so_85_f100.nc
+  525  cdo sinfon sfcWind_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc
+  526  cdo mergetime sfcWind_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc sfcWind_Amon_HadGEM2-ES_rcp26_r1i1p1_200512-203011.nc sfc_hist_26.nc
+  527  cdo mergetime sfcWind_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc sfcWind_Amon_HadGEM2-ES_rcp45_r1i1p1_200512-203011.nc sfc_hist_45.nc
+  528  cdo mergetime sfcWind_Amon_HadGEM2-ES_historical_r1i1p1_198412-200511.nc sfcWind_Amon_HadGEM2-ES_rcp85_r1i1p1_200512-203011.nc sfc_hist_85.nc
+  529  cdo mergetime sfcWind_Amon_HadGEM2-ES_rcp26_r1i1p1_208012-209911.nc sfcWind_Amon_HadGEM2-ES_rcp26_r1i1p1_209912-212411.nc sfc_26.nc
+  530  cdo mergetime sfcWind_Amon_HadGEM2-ES_rcp45_r1i1p1_208012-209911.nc sfcWind_Amon_HadGEM2-ES_rcp45_r1i1p1_209912-212411.nc sfc_45.nc
+  531  cdo mergetime sfcWind_Amon_HadGEM2-ES_rcp85_r1i1p1_208012-209912.nc -selyear,2100/2142 sfcWind_Amon_HadGEM2-ES_rcp85_r1i1p1_209912-212411.nc sfc_85.nc
+  532  cdo mergetime sfcWind_Amon_HadGEM2-ES_rcp85_r1i1p1_208012-209912.nc -selyear,2100/2124 sfcWind_Amon_HadGEM2-ES_rcp85_r1i1p1_209912-212411.nc sfc_85.nc
+  533  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2000/2014 sfc_hist_26.nc sfc_26_base.nc
+  534  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2000/2014 sfc_hist_45.nc sfc_45_base.nc
+  535  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2000/2014 sfc_hist_85.nc sfc_85_base.nc
+  536  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2090/2100 sfc_26.nc sfc_26_fut.nc
+  537  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2090/2100 sfc_45.nc sfc_45_fut.nc
+  538  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2090/2100 sfc_85.nc sfc_85_fut.nc
+  539  cdo sub sfc_26_fut.nc sfc_26_base.nc sfc_26_f100.nc
+  540  cdo sub sfc_45_fut.nc sfc_45_base.nc sfc_45_f100.nc
+  541  cdo sub sfc_85_fut.nc sfc_85_base.nc sfc_85_f100.nc
+  542  history
+  501  cd /cygdrive/c/pesquisa/modelagem/climate_layers
+  502  PATH="$PATH:.:"
+  503  cdo sinfon tos_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc
+  504  cdo mergetime tos_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc tos_Omon_HadGEM2-ES_rcp26_r1i1p1_200512-209911.nc tos_Omon_HadGEM2-ES_rcp26_r1i1p1_209912-219911.nc tos_hist_26.nc
+  505  cdo mergetime tos_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc tos_Omon_HadGEM2-ES_rcp45_r1i1p1_200512-209911.nc tos_Omon_HadGEM2-ES_rcp45_r1i1p1_209912-219911.nc tos_hist_45.nc
+  506  cdo mergetime tos_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc tos_Omon_HadGEM2-ES_rcp85_r1i1p1_200512-209912.nc -selyear,2100/2199 tos_Omon_HadGEM2-ES_rcp85_r1i1p1_209912-219911.nc tos_hist_85.nc
+  507  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2000/2014 tos_hist_26.nc tos_26_base.nc
+  508  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2000/2014 tos_hist_45.nc tos_45_base.nc
+  509  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2000/2014 tos_hist_85.nc tos_85_base.nc
+  510  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2090/2100 tos_hist_26.nc tos_26_fut.nc
+  511  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2090/2100 tos_hist_45.nc tos_45_fut.nc
+  512  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2090/2100 tos_hist_85.nc tos_85_fut.nc
+  513  cdo sub tos_26_fut.nc tos_26_base.nc tos_26_f100.nc
+  514  cdo sub tos_45_fut.nc tos_45_base.nc tos_45_f100.nc
+  515  cdo sub tos_85_fut.nc tos_85_base.nc tos_85_f100.nc
+  516  cdo mergetime si_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc si_Omon_HadGEM2-ES_rcp26_r1i1p1_200512-209911.nc si_Omon_HadGEM2-ES_rcp26_r1i1p1_209912-219911.nc si_hist_26.nc
+  517  cdo mergetime si_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc si_Omon_HadGEM2-ES_rcp45_r1i1p1_200512-209911.nc si_Omon_HadGEM2-ES_rcp45_r1i1p1_209912-219911.nc si_hist_45.nc
+  518  cdo mergetime si_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc si_Omon_HadGEM2-ES_rcp85_r1i1p1_200512-209912.nc -selyear,2100/2199 si_Omon_HadGEM2-ES_rcp85_r1i1p1_209912-219911.nc si_hist_85.nc
+  519  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2000/2014 si_hist_26.nc si_26_base.nc
+  520  cdo sinfon si_26_base.nc
+  521  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2000/2014 si_hist_45.nc si_45_base.nc
+  522  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2000/2014 si_hist_85.nc si_85_base.nc
+  523  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2090/2100 si_hist_26.nc si_26_fut.nc
+  524  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2090/2100 si_hist_45.nc si_45_fut.nc
+  525  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2090/2100 si_hist_85.nc si_85_fut.nc
+  526  cdo sub si_26_fut.nc si_26_base.nc si_26_f100.nc
+  527  cdo sub si_45_fut.nc si_45_base.nc si_45_f100.nc
+  528  cdo sub si_85_fut.nc si_85_base.nc si_85_f100.nc
+  549  cdo sinfon ph_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc
+  550  cdo mergetime ph_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc ph_Omon_HadGEM2-ES_rcp26_r1i1p1_200512-209911.nc ph_Omon_HadGEM2-ES_rcp26_r1i1p1_209912-219911.nc ph_hist_26.nc
+  551  cdo mergetime ph_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc ph_Omon_HadGEM2-ES_rcp45_r1i1p1_200512-209911.nc ph_Omon_HadGEM2-ES_rcp45_r1i1p1_209912-219911.nc ph_hist_45.nc
+  552  cdo mergetime ph_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc ph_Omon_HadGEM2-ES_rcp85_r1i1p1_200512-209912.nc -selyear,2100/2199 ph_Omon_HadGEM2-ES_rcp85_r1i1p1_209912-219911.nc ph_hist_85.nc
+  553  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2000/2014 ph_hist_26.nc ph_26_base.nc
+  554  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2000/2014 ph_hist_45.nc ph_45_base.nc
+  555  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2000/2014 ph_hist_85.nc ph_85_base.nc
+  556  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2090/2100 ph_hist_26.nc ph_26_fut.nc
+  557  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2090/2100 ph_hist_45.nc ph_45_fut.nc
+  558  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2090/2100 ph_hist_85.nc ph_85_fut.nc
+  559  cdo sub ph_26_fut.nc ph_26_base.nc ph_26_f100.nc
+  560  cdo sub ph_45_fut.nc ph_45_base.nc ph_45_f100.nc
+  561  cdo sub ph_85_fut.nc ph_85_base.nc ph_85_f100.nc
+  562  history
+  563  cdo mergetime po4_Omon_IPSL-CM5A-LR_historical_r1i1p1_195001-200512.nc po4_Omon_IPSL-CM5A-LR_rcp26_r1i1p1_200601-210512.nc po4_hist_26.nc
+  564  cdo mergetime po4_Omon_IPSL-CM5A-LR_historical_r1i1p1_195001-200512.nc po4_Omon_IPSL-CM5A-LR_rcp45_r1i1p1_200601-210512.nc po4_hist_45.nc
+  565  cdo mergetime po4_Omon_IPSL-CM5A-LR_historical_r1i1p1_195001-200512.nc po4_Omon_IPSL-CM5A-LR_rcp85_r1i1p1_200601-210512.nc po4_hist_85.nc
+  566  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2000/2014 po4_hist_26.nc po4_26_base.nc
+  567  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2000/2014 po4_hist_45.nc po4_45_base.nc
+  568  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2000/2014 po4_hist_85.nc po4_85_base.nc
+  569  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2090/2100 po4_hist_26.nc po4_26_fut.nc
+  570  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2090/2100 po4_hist_45.nc po4_45_fut.nc
+  571  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmax -selyear,2090/2100 po4_hist_85.nc po4_85_fut.nc
+  572  cdo sub po4_26_fut.nc po4_26_base.nc po4_26_f100.nc
+  573  cdo sub po4_45_fut.nc po4_45_base.nc po4_45_f100.nc
+  574  cdo sub po4_85_fut.nc po4_85_base.nc po4_85_f100.nc
+  575  history
+#After we decided to use relative change for nitrate, phosphate, salinity and chl-a
+  513  cdo div po4_26_f100.nc po4_26_base.nc po4_26_rf100.nc
+  514  cdo div po4_45_f100.nc po4_45_base.nc po4_45_rf100.nc
+  515  cdo div po4_85_f100.nc po4_85_base.nc po4_85_rf100.nc
+  516  cdo div no3_26_f100.nc no3_26_base.nc no3_26_rf100.nc
+  517  cdo div no3_45_f100.nc no3_45_base.nc no3_45_rf100.nc
+  518  cdo div no3_85_f100.nc no3_85_base.nc no3_85_rf100.nc
+  519  cdo div chl_26_f100.nc chl_26_base.nc chl_26_rf100.nc
+  520  cdo div chl_45_f100.nc chl_45_base.nc chl_45_rf100.nc
+  521  cdo div chl_85_f100.nc chl_85_base.nc chl_85_rf100.nc
+  522  cdo div so_26_f100.nc so_26_base.nc so_26_rf100.nc
+  523  cdo div so_45_f100.nc so_45_base.nc so_45_rf100.nc
+  524  cdo div so_85_f100.nc so_85_base.nc so_85_rf100.nc
+#We redid the NO3 RCP2.6 after founding an error in the code above.
+  517  cdo sinfon no3_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc
+  518  cdo mergetime no3_Omon_HadGEM2-ES_historical_r1i1p1_195912-200512.nc no3_Omon_HadGEM2-ES_rcp26_r1i1p1_200512-209911.nc no3_Omon_HadGEM2-ES_rcp26_r1i1p1_209912-219911.nc no3_hist_26.nc
+  519  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2000/2014 no3_hist_26.nc no3_26_base.nc
+  520  cdo -sellonlatbox,-180,180,-90,90 -remapbil,r360x216 -timmean -selyear,2090/2100 no3_hist_26.nc no3_26_fut.nc
+  521  cdo sub no3_26_fut.nc no3_26_base.nc no3_26_f100.nc
+  522  cdo div no3_26_f100.nc no3_26_base.nc no3_26_rf100.nc
+
+
