@@ -1,0 +1,1851 @@
+---
+title: 'Predicted shifts in the distribution of Atlantic reef building corals in face of climate change'
+author:
+  - Silas C. Principe:
+      email: silasprincipe@yahoo.com.br
+      institute: [USP]
+      correspondence: true
+  - name: João Espíndola
+    institute: USP
+  - name: André L. Acosta
+    institute: IEA
+  - name: Tito M. C. Lotufo
+    institute: USP
+institute:
+  - USP: Laboratório de Biologia Recifal, Instituto Oceanográfico, Universidade de São Paulo, São Paulo, Brazil.
+  - IEA: Instituto de Estudos Avançados, Universidade de São Paulo, São Paulo, Brazil.
+bibliography:
+output:
+  word_document:
+    reference_docx: article_styling/my-styles.docx
+    pandoc_args:
+      - '--lua-filter=article_styling/lua-filters/scholarly-metadata.lua'
+      - '--lua-filter=article_styling/lua-filters/author-info-blocks.lua'
+---
+
+```{r notes, message=FALSE, warning=FALSE, include=FALSE}
+#NOTE FOR READERS:
+
+#This section is fully reproducible. Exception is the treatment of future layers (netcdf files from CMIP5) that were first edited on CDO (Climate Data Operators), an open source software (so, it's possible to follow our pathway there easily). More information regarding this is in the section of environmental layers.
+
+#Readers may be aware of two important points:
+#1. As this is a modelling procedure, some steps may take several hours to run.
+#2. Due to inherent aspects of some functions/packages, even setting a seed there may still be small differences when running the code again. However, this will not interfere in the final results.
+#Because of that, for some steps files are provided ready to use. Even though, full codes are supplied and there will be a notice pointing to it, so the reader can decide to run everything again or not.
+
+#Here we will just run the following steps:
+# Pseudo-absences generation
+# Block preparing for cross validation
+# BIOMOD Modeling
+# Get variables importances
+# Get metrics
+# Prepare maps
+
+#The previous steps (environmental layers preparing, data cleaning, etc.) can be run with the codes provided
+
+#Also, Bootstrap by default will not run, but you can just set the chunk to run if you want. But NOTE THAT THIS MAY TAKE SEVERAL HOURS TO RUN (maybe days).
+
+# One last note: due to word/knitr limitations it may be the case that the images will appear bigger than the page
+# in the final word output. Just reduce it in the output to see it full.
+```
+
+```{r Pseudo-absence generation, eval=TRUE, include=FALSE, echo=FALSE, message=FALSE, warning=FALSE}
+
+# Set seed for replicability
+set.seed(2932)
+
+# Load the function. To see how pseudo-absences are generated, see the source
+# file. The same for the others functions used here.
+source("functions/pseudoabGen.R")
+
+# Run the pseudo absence generation
+lapply(c("muhi", "moca", "side"), pseudoabGen)
+
+# Files are now saved to be used in the next step.
+
+```
+
+```{r Cross-validation blocks generation, eval=TRUE, include=FALSE, echo=FALSE, message=FALSE, warning=FALSE}
+
+# Load function
+source("functions/blockGen.R")
+
+# Run the generation of blocks for cross validation
+blockGen(c("muhi", "moca", "side"))
+
+# Block files are now saved to be used in the next step.
+
+```
+
+```{r Modeling proccess, eval=TRUE, include=FALSE, echo=FALSE, message=FALSE, warning=FALSE}
+
+# Load function
+source("functions/biomodModelling.R")
+
+# Run the modeling procedure
+lapply(c("muhi", "moca", "side"), 
+       biomodModelling,
+       round.code = "rbf1") # this is the code that is used by
+                            # BIOMOD2 to save the files in the
+                            # respective species' folders.
+
+# All modelling process is done.
+
+```
+
+
+Results
+=======
+
+Models performance and variables importance
+-------------------------------------------
+
+The models performed well for all three species (Table 1). All
+algorithms achieved TSS scores higher than the established threshold of
+0.7 in the cross-validation procedure and were thus included in the
+final ensemble. The BRT and RF algorithms achieved the highest TSS
+scores, except when applied for *Siderastrea*, for which the GLMs
+outperformed RFs. The GAMs consistently yielded low TSS values among the
+algorithms. The AUC (area under the curve) values were higher than the
+TSS values for all models, but this metric can be inflated and should be
+used with caution as a model performance metric.
+
+```{r Set the models performance table, echo=FALSE, message=FALSE, warning=FALSE}
+
+#Load libraries
+library(knitr)
+
+#Get source function
+source("functions/metricsTable.R")
+
+#Get table and make adjustments
+metrics.table <- lapply(c("muhi", "moca", "side"), metricsTable, round.code = "rbf1")
+
+metrics.table <- bind_rows(metrics.table)
+metrics.table <- cbind(data.frame("Species" = c("M. hispida", rep(NA, 3),
+                                                "M. cavernosa", rep(NA, 3),
+                                                "Siderastrea", rep(NA, 3))), metrics.table[,1:5])
+
+#Print table
+options(knitr.kable.NA = '')
+kable(metrics.table,
+      format = "pandoc",
+      caption = "Table 1 Performance of species distribution models for Mussismilia hispida, Montastraea cavernosa and Siderastrea obtained through four distinct algorithms (Generalized Additive Model - GAM; Boosted Regression Trees - BRT; Generalized Linear Models - GLM; Random Forest - RF). Values are the average of five runs of block cross-validation with ± standard deviation, for each algorithm. TSS is the True Skill Statistics and was used as the main metric. AUC is the Area Under the curve metric. TSS and AUC values range from 0 to 1 and specificity and sensitivity values range from 0 to 100. Models in bold are the algorithms that had the better performance for each species.")
+
+```
+
+```{r Bootstrap analysis of variation, eval=FALSE, include=FALSE, echo=FALSE, message=FALSE, warning=FALSE}
+
+#### This part of the code will not run! If you want it to run change eval=TRUE
+
+# Load and run code
+
+source("codes/cv_bootstrap.R")
+
+```
+
+Our bootstrap analysis for detecting uncertainty in the predictions of
+models showed higher variations on the edges of the occurrence areas
+(Supplementary Figures 1, 2, and 3). Thus, the predictions are thought
+to be more reliable in the current range of the species than elsewhere.
+The \"unalikeability\", based on the binary ensembles, was less than 0.3
+for all models/species. In general, the models were more often in
+disagreement on the edges of the presence points. As expected, the
+future predictions showed consistently higher uncertainty for all
+species when compared to the current period.
+
+The most relevant variables for the models varied among species (Table
+2). Salinity contributed the most to explaining the habitat suitability
+of *M. hispida* geographically expressed in the ensemble model. For *M.
+cavernosa* and *Siderastrea*, chlorophyll-a and temperature were the
+variables with the greatest importances. Calcite, the current velocity
+and the cloud cover showed minor importances for all species models.
+
+```{r Set the variables importance table, echo=FALSE}
+
+#Load libraries
+library(knitr)
+
+#Get source function
+source("functions/varimpTable.R")
+
+#Get table and make adjustments
+var.table <- lapply(c("muhi", "moca", "side"), varimpTable, round.code = "rbf1")
+
+var.table <- lapply(var.table, pivot_longer, cols = c(1:12), names_to = "Variable")
+
+var.table <- cbind(var.table[[1]], var.table[[2]]$value, var.table[[3]]$value)
+
+colnames(var.table) <- c("Variable", "M. hispida", "M. cavernosa", "Siderastrea")
+
+var.table$Variable <- c("Calcite concentration - mean",
+                        "Chlorophyll-a concentration - maximum",
+                        "Cloud cover - maximum", "Nitrate concentration - mean",
+                        "Sea water pH - mean", "Phosphate concentration - maximum",
+                        "Salinity - mean",
+                        "Silicate concentration - mean",
+                        "Sea surface temperature - maximum",
+                        "Current velocity - mean",
+                        "Wind speed - mean",
+                        "Depth")
+#Print table
+kable(var.table,
+      format = "pandoc",
+      caption = "Table 2 Importance of variables used to produce the ensemble models. Values are the mean importance obtained in a 20-fold permutation of variables. On each permutation, each variable is shuffled and a new prediction is generated. Then, a Pearson\'s correlation between the original prediction and the \'shuffled\' one is generated. Values of importance are given as 1-correlation. Highest values reveals a higher influence of the variable on the model. The most important variable for each species is in bold.")
+
+```
+
+
+Distributions of reef builders
+-----------------------------
+
+All species studied here will experience a reduction in the suitability
+of their habitats in the future (2100) in at least one scenario;
+however, increases in suitable areas were also projected in some
+regions. As expected, *M. hispida* showed the smallest suitable area
+among the three species (even considering suitable areas beyond its
+current range), while *Siderastrea* had the widest range of suitable
+areas. A summary of the current distributions and expected changes in
+the future scenarios is provided in Table 3. To better understand how
+the species are distributed in the present and in the future, we divided
+the Atlantic into three distinct regions, using the Marine Ecoregions of
+the World classification as a reference (Spalding et al., 2007). The
+first region was named the Southwestern Atlantic region and comprises
+the warm temperate southwestern Atlantic, tropical southwestern
+Atlantic, North Brazil Shelf and Magellanic provinces. The North
+Atlantic region includes the tropical northwestern Atlantic, the warm
+temperate northwestern Atlantic and the cold temperate northwestern
+Atlantic provinces. Finally, the Eastern Atlantic region comprises all
+provinces in the eastern part of our study area, including the islands
+not contained in the other provinces.
+
+
+
+```{r Get values of change in the distribution of species, echo=FALSE, message=FALSE, warning=FALSE}
+
+#Get source function
+source("functions/getDiff.R")
+source("functions/areaChange.R")
+
+# Calculate the change in area for all species
+area.change <- lapply(c("muhi", "moca", "side"), areaChange, round.code = "rbf1")
+
+#Muhi data prep
+muhi <- getDiff(area.change[[1]])
+
+tableFun <- function(dif, orig){
+  
+  ftable <- data.frame(matrix(nrow = 4, ncol = 5))
+  colnames(ftable) <- c("Region", "Current area", "RCP 2.6", "RCP 4.5", "RCP 8.5")
+  ftable[,1] <- c("Total", "Southwestern Atlantic", "North Atlantic", "Eastern Atlantic")
+  
+  ftable[1,2] <- round(orig[2,1], digits = 1)
+  ftable[2,2] <- round(orig[4,1], digits = 1)
+  ftable[3,2] <- round(orig[6,1], digits = 1)
+  ftable[4,2] <- round(orig[8,1], digits = 1)
+  
+  for (i in 3:5) {
+    
+    cc <- i-1
+    
+    ftable[1,i] <- paste0(round(ftable[1,2]+dif[1,cc], 1), " (", dif[2,cc], "%)")
+    ftable[2,i] <- paste0(round(ftable[2,2]+dif[3,cc], 1), " (", dif[4,cc], "%)")
+    ftable[3,i] <- paste0(round(ftable[3,2]+dif[5,cc], 1), " (", dif[6,cc], "%)")
+    ftable[4,i] <- paste0(round(ftable[4,2]+dif[7,cc], 1), " (", dif[8,cc], "%)")
+
+    
+  }
+  
+  ftable
+  
+}
+
+muhi.f <- tableFun(muhi, area.change[[1]])
+
+#Moca data prep
+
+moca <- getDiff(area.change[[2]])
+
+moca.f <- tableFun(moca, area.change[[2]])
+
+
+#Side data prep
+
+side <- getDiff(area.change[[3]])
+
+side.f <- tableFun(side, area.change[[3]])
+
+
+#Get table and make adjustments
+change.table <- rbind(muhi.f, moca.f, side.f)
+change.table <- cbind(data.frame("Species" = c("M. hispida", rep(NA, 3),
+                                               "M. cavernosa", rep(NA, 3),
+                                               "Siderastrea", rep(NA, 3))),
+                      change.table)
+
+#Print table
+options(knitr.kable.NA = '')
+kable(change.table,
+      format = "pandoc",
+      caption = "Table 3 Current and future projected area for three reef builders of the Atlantic obtained through species distribution models. Future projections are for three different scenarios of Relative Concentration Pathway (RCP 2.6, RCP 4.5 and RCP 8.5). Area (in Km²) is shown by regions (see results section for further information). Values in brackets are percentage of area change in future scenarios (positive, gain; negative, loss). Note that for *M. hispida*, the value in bold is the region that the species currently inhabit as it\'s endemic from Brazil, but models were projected for the whole study area (other values).")
+
+```
+
+In the Southwestern Atlantic, which is the current range of distribution
+of *M. hispida*, suitable areas were projected from the north coast of
+Santa Catarina (27°S) to Maranhão state (0.8°S), with some gaps
+associated with river discharges (Figure 1). A major gap is associated
+with the discharge of the São Francisco River (10°S), one of the major
+rivers of Brazil. This gap was also evident in the ranges of *M.
+cavernosa* and *Siderastrea* (Figures 3 and 4, respectively). To the
+south, another gap is located near the areas influenced by the Doce
+River discharge along the coast of Espírito Santo state (approximately
+19-20°S). Additionally, there is a discontinuity in the distribution
+associated with Guanabara Bay on the coast of Rio de Janeiro state
+(23°S). In northern Brazil, only two patches of suitable areas were
+projected, with the area farther north associated with the Parcel do
+Manuel Luis reef. Beyond the current distribution of the species, the
+model also identified suitable areas in the Caribbean region and on the
+coast of Morocco. Although the model projected suitable areas for *M.
+hispida* at depths over 100 m, the majority of suitable areas were
+shallower than 40 m (median = 21.2 m; Q1 = 42.4 m; Q3 = 8.2 m), which is
+in agreement with the actual biology of the species.
+
+```{r Current map of M. hispida, fig.cap="Figure 1 Projected habitat suitability of Mussismilia hispida in the Atlantic obtained through an ensemble modeling approach. Map (A) shows the presence points (in orange) used for training the model and shows (in purple) the expected range of M. hispida according to the IUCN. Map (B) presents the predicted habitat suitability for the current period. In both maps inset maps show the Abrolhos region, where M. hispida plays a key role as a habitat-forming species. In map (B), the left inset map highlights the patches of suitable areas in northern Brazil.", fig.align="center", fig.height=5.9, fig.width=16.3, message=FALSE, warning=FALSE, echo = FALSE}
+### Generate map for current projection of Mussismilia hispida ----
+
+# Load base objects for maps ----
+source("codes/graphs/plot_maps_base.R")
+
+# Establish the round code to generate map ----
+rd <- "rbf1"
+
+#Presence points map ----
+m.hisp.iucn <- st_as_sf(shapefile("gis/iucn_maps/mussismilia_hispida.shp"))
+m.hisp.pts <- read.csv("data/muhi/muhi_cell.csv")
+
+m.hisp.range <- base.tr + geom_sf(data = m.hisp.iucn, fill = alpha("#785EF0", 1), color = NA) +
+        coord_sf(
+                xlim = c(-99, 22),
+                ylim = c(-42.5, 42.5),
+                expand = FALSE,
+                label_axes = list(top = "E", left = "N")
+        ) +
+        geom_point(data = m.hisp.pts, aes(x = decimalLongitude, y = decimalLatitude),
+                   color = "#FFD400", size = 1, alpha = 0.8) + n.arrow +
+        main.scale + main.theme + 
+        main.s.x + main.s.y 
+
+m.hisp.r.ins <- m.hisp.range +
+        coord_sf(
+                xlim = c(-49, -35),
+                ylim = c(-28.5, -15.5),
+                expand = FALSE
+        ) + inset.theme
+
+m.hisp.range.f <- m.hisp.range +
+        annotate(
+                "rect",
+                xmin = -49,
+                xmax = -35,
+                ymin = -28.5,
+                ymax = -15.5,
+                color = "grey50",
+                alpha = 0,
+                size = 0.8
+        ) +
+        annotate(
+                "segment",
+                #x1 > insh1 ; x2 > insh2
+                x = c(-35),
+                y = c(-23),
+                xend = c(-10),
+                yend = c(-23),
+                lineend = "round",
+                colour = "grey50",
+                size = 0.8
+        ) +
+        annotation_custom(
+                grob = ggplotGrob(m.hisp.r.ins),
+                xmin = -22,
+                xmax = 19,
+                ymin = -30,
+                ymax = 3
+        ) +
+        ggtitle("A")
+
+
+
+
+#Current map ----
+m.hisp <- paSuit("muhi", rd, axis.p = 'right', nar = F)
+
+insh1 <- paSuit('muhi', rd, 'inset') +
+        coord_sf(
+                xlim = c(-40.3, -33),
+                ylim = c(-21.5, -16.5),
+                expand = FALSE
+        )
+
+
+insh2 <- paSuit('muhi', rd, 'inset') +
+        coord_sf(
+                xlim = c(-44.6, -38),
+                ylim = c(-4, -0.3),
+                expand = FALSE
+        )
+
+
+m.hisp.main <- m.hisp +
+        annotate(
+                "rect",
+                xmin = -40.3,
+                xmax = -33,
+                ymin = -21.5,
+                ymax = -16.5,
+                color = "grey50",
+                alpha = 0,
+                size = 0.8
+        ) +
+        annotate(
+                "rect",
+                xmin = -44.6,
+                xmax = -38,
+                ymin = -4,
+                ymax = -0.3,
+                color = "grey50",
+                alpha = 0,
+                size = 0.8
+        ) +
+        annotate(
+                "segment",
+                #x1 > insh1 ; x2 > insh2
+                x = c(-33, -44.6),
+                y = c(-18, -2.3),
+                xend = c(-28, -54),
+                yend = c(-18, -2.3),
+                lineend = "round",
+                colour = "grey50",
+                size = 0.8
+        ) +
+        annotation_custom(
+                grob = ggplotGrob(insh1),
+                xmin = -28,
+                xmax = -10,
+                ymin = -27,
+                ymax = -10
+        ) + annotation_custom(
+                grob = ggplotGrob(insh2),
+                xmin = -80,
+                xmax = -52,
+                ymin = 0,
+                ymax = -16
+        ) +
+        ggtitle("B")
+
+
+# Create the figure using pacthwork and save ----
+muhi.fig1 <- m.hisp.range.f + m.hisp.main
+
+muhi.fig1
+
+ggsave("figures/fig1_muhi_current.tiff", muhi.fig1, width = 41, height = 15, dpi = 300, units = 'cm')
+
+rm(list = ls())
+```
+
+
+There were increases in the projected suitable areas for *M. hispida* in
+two future scenarios (RCP2.6 and RCP4.5; Figure 2). However, when
+considering only areas in the Southwestern Atlantic region, decreases
+are expected in all scenarios (Table 3 and Figure 2). Suitable areas for
+*M. hispida* will be lost all along the northeastern coast of Brazil and
+along its southern limit, regardless of the scenario. Additionally, the
+two patches on the coast of the Maranhão (0.8°S) and Ceará (3.6°S)
+states will be lost. Major losses of suitable areas will also occur in
+the Vitória-Trindade seamount chain and in the Abrolhos region; these
+losses would be critical in the RCP4.5 and RCP8.5 scenarios, with all
+suitable areas being lost.
+
+New suitable areas are predicted in the southern and northern boundaries
+of the present distribution of *M. hispida* for all scenarios. In the
+RCP4.5 and RCP8.5 scenarios, the gain of new areas is diminished, but
+suitable areas are expected to occur far south of the current
+distribution region along the coast of Argentina (40°S to 42°S).
+Interestingly, some areas that would become suitable in RCP2.6 scenario
+are in regions of river discharge. New suitable areas would also occur
+in the denominated North Atlantic region. These projections do not
+consider the Amazon river mouth barrier, which currently limits the
+distribution of this species to the Brazilian coast. There was no
+evident change trend in the suitable area depth (RCP2.6: median = 20.1
+m, RCP4.5: median = 16.8 m, RCP8.5: median = 17.3 m; Supplementary Table
+2).
+
+```{r Future map of M. hispida, fig.cap="Figure 2 Projected habitat suitabilities for future  relative concentration pathway (RCP) scenarios for Mussismilia hispida in the Atlantic Ocean, obtained through an ensemble modeling approach. The models were trained on present-day data of each species and projected for the (A) RCP2.6, (B) RCP4.5 and (C) RCP8.5 scenarios. Inset maps highlight changes in northern Brazil (top) and in the Abrolhos region (bottom).", fig.align="center", fig.height=16.3, fig.width=8.9, message=FALSE, warning=FALSE, echo = FALSE}
+
+### Generate map for future scenarios of Mussismilia hispida ----
+
+# Load base objects for maps ----
+source("codes/graphs/plot_maps_base.R")
+
+# Establish the round code to generate map ----
+rd <- "rbf1"
+
+# Create a list to hold plots
+plots.list <- list()
+
+# Execute all the scenarios in loop ----
+for (i in 1:3) {
+        
+        rcp.code <- c("rcp26", "rcp45", "rcp85")[i]
+        
+        
+        if (i == 1) {
+                axis.sel <- "left-top"
+                nar.sel = TRUE
+        }
+        
+        
+        if (i == 2) {
+                axis.sel <- "left-only"
+                nar.sel = FALSE
+        }
+        
+        
+        if (i == 3) {
+                axis.sel <- "left"
+                nar.sel = FALSE
+        }
+        
+        
+        
+        if (i == 1) {
+                rcp.plot <-
+                        rcpSuit("muhi", rd, rcp.code, 100, axis.p = axis.sel, nar = nar.sel)
+        }
+        
+        
+        if (i != 1) {
+                rcp.plot <-
+                        rcpSuit("muhi", rd, rcp.code, 100, axis.p = axis.sel, nar = nar.sel) +
+                        theme(legend.position = 'none') 
+        }
+        
+        
+        ins1 <-
+                rcpSuit("muhi",
+                        rd,
+                        rcp.code,
+                        100,
+                        axis.p = 'none',
+                        theme = 'inset') +
+                coord_sf(
+                        xlim = c(-42, -31),
+                        ylim = c(-10.5, -1),
+                        expand = FALSE
+                )
+        
+        ins2 <-
+                rcpSuit("muhi",
+                        rd,
+                        rcp.code,
+                        100,
+                        axis.p = 'none',
+                        theme = 'inset') +
+                coord_sf(
+                        xlim = c(-40.3, -33),
+                        ylim = c(-21.5, -16.5),
+                        expand = FALSE
+                )
+        
+        final.plot <- rcp.plot +
+                annotate(
+                        "rect",
+                        xmin = -42,
+                        xmax = -31,
+                        ymin = -10.5,
+                        ymax = -1,
+                        color = "grey50",
+                        alpha = 0,
+                        size = 0.8
+                ) +
+                annotate(
+                        "rect",
+                        xmin = -40.3,
+                        xmax = -33,
+                        ymin = -21.5,
+                        ymax = -16.5,
+                        color = "grey50",
+                        alpha = 0,
+                        size = 0.8
+                ) +
+                annotate(
+                        "segment",
+                        x = c(-65, -33),
+                        y = c(-5, -18),
+                        xend = c(-42, -20),
+                        yend = c(-5, -18),
+                        lineend = "round",
+                        colour = "grey50",
+                        size = 0.8
+                ) +
+                annotation_custom(
+                        grob = ggplotGrob(ins1),
+                        xmin = -85,
+                        xmax = -55,
+                        ymin = 5,
+                        ymax = -21
+                ) +
+                annotation_custom(
+                        grob = ggplotGrob(ins2),
+                        xmin = -26,
+                        xmax = -2,
+                        ymin = -27,
+                        ymax = -9
+                )+  # The lines below are a "hack" to adjust the tag 
+                # annotation position
+                theme(
+                        plot.margin = unit(c(0.5, 5, 0.5, 5), 'mm'),
+                        axis.title.y = element_text(
+                                margin = margin(t = 0, r = 20, b = 0, l = 0))
+                )+ylab(" ") 
+        
+        plots.list[[i]] <- final.plot
+
+}
+
+# Create the figure using pacthwork and save ----
+muhi.fig2 <- plots.list[[1]] / plots.list[[2]] / plots.list[[3]] +
+        plot_annotation(tag_levels = "A") &
+        theme(plot.tag.position = c(0, 0.95),
+              plot.tag = element_text(size = 18))
+
+muhi.fig2
+
+ggsave("figures/fig2_muhi_future.tiff", muhi.fig2,
+       width = 22.5, height = 41, dpi = 300, units = 'cm')
+
+rm(list = ls())
+```
+
+
+*Montastraea cavernosa* and *Siderastrea* exhibited similar habitat
+suitability patterns in the current period, in agreement with their
+current distribution ranges (Figures 3 and 4, respectively). The
+majority of suitable areas for both species were distributed in the
+northeastern and north coast of Brazil, up to the coast of Maranhão
+state and in the North Atlantic. Suitable areas were also observed at
+similar depths, although the maximum depth of *M. cavernosa* was deeper
+than that of *Siderastrea* (*M. cavernosa* - median = 40.5 m, maximum =
+194.6 m; *Siderastrea* - median = 37.6 m, maximum = 185.8 m). Despite
+these similarities, some differences in habitat suitability are evident.
+The predicted southern limit of the suitable areas for *M. cavernosa*
+was 22.4°S, but the *Siderastrea* distribution extended farther south,
+reaching Rio de Janeiro state (23°S). Additionally, adequate areas for
+*Siderastrea* were predicted on the Ascension, Cape Verde and São Tomé
+islands, but suitable areas for *M. cavernosa* were found only on São
+Tomé and Ascension (although the species is not currently found in the
+latter area). Another evident difference is the larger extent of
+suitable areas for *Siderastrea* in the Gulf of México and on the
+western side of Florida than that for *M. cavernosa*. However, *M.
+cavernosa* was the only species with suitable areas on Bermudas Island
+in the western Atlantic, thus having a higher northern limit than that
+of *Siderastrea* (approximately 32°N versus approximately 28°N for
+*Siderastrea*). Several areas that were considered to be within the
+ranges of both species according to the IUCN were not supported by our
+models as suitable areas.
+
+```{r Current map of M. cavernosa, fig.cap="Figure 3 Projected habitat suitability for Montastraea cavernosa in the Atlantic Ocean obtained through an ensemble modeling approach. Map (A) shows the presence points (in orange) used for training the model and shows (in purple) the expected range of M. cavernosa according to the IUCN. Map (B) shows the predicted habitat suitability for the current period. In both maps, inset maps highlight the Abrolhos region (left) and São Tomé islands (right), and in map (B), the top inset highlights the Caribbean islands.", fig.align="center", fig.height=5.9, fig.width=16.3, message=FALSE, warning=FALSE, echo = FALSE}
+
+### Generate map for current projection of Montastraea cavernosa ----
+
+# Load base objects for maps ----
+source("codes/graphs/plot_maps_base.R")
+
+# Establish the round code to generate map ----
+rd <- "rbf1"
+
+#Presence points map ----
+moca.iucn <- st_as_sf(shapefile("gis/iucn_maps/montastraea_cavernosa.shp"))
+moca.pts <- read.csv("data/moca/moca_cell_thinned.csv")
+
+moca.range <- base.tr + geom_sf(data = moca.iucn, fill = alpha("#785EF0", 1), color = NA) +
+        coord_sf(
+                xlim = c(-99, 22),
+                ylim = c(-42.5, 42.5),
+                expand = FALSE,
+                label_axes = list(top = "E", left = "N")
+        ) +
+        geom_point(data = moca.pts, aes(x = decimalLongitude, y = decimalLatitude),
+                   color = "#FFD400", size = 1, alpha = 0.8) + n.arrow +
+        main.scale + main.theme + 
+        main.s.x + main.s.y 
+
+ins1 <- moca.range +
+        coord_sf(
+                xlim = c(-49, -35),
+                ylim = c(-28.5, -15.5),
+                expand = FALSE
+        ) + inset.theme
+
+ins2 <- moca.range +
+        coord_sf(
+                xlim = c(3, 8),
+                ylim = c(-3, 3),
+                expand = FALSE
+        ) + inset.theme
+
+range.f <- moca.range +
+        annotate(
+                "rect",
+                xmin = -49,
+                xmax = -35,
+                ymin = -28.5,
+                ymax = -15.5,
+                color = "grey50",
+                alpha = 0,
+                size = 0.8
+        ) +
+        annotate(
+                "rect",
+                xmin = 8,
+                xmax = 3,
+                ymin = -3,
+                ymax = 3,
+                color = "grey50",
+                alpha = 0,
+                size = 0.8
+        ) +
+        annotate(
+                "segment",
+                #x1 > insh1 ; x2 > insh2
+                x = c(-49, 6.5),
+                y = c(-23, 3),
+                xend = c(-80, 6.5),
+                yend = c(-23, 15),
+                lineend = "round",
+                colour = "grey50",
+                size = 0.8
+        ) +
+        annotation_custom(
+                grob = ggplotGrob(ins1),
+                xmin = -92,
+                xmax = -56,
+                ymin = -30,
+                ymax = 2
+        ) +
+        annotation_custom(
+                grob = ggplotGrob(ins2),
+                xmin = 0,
+                xmax = 18,
+                ymin = 10,
+                ymax = 30
+        )+
+        ggtitle("A")
+
+
+#Current map ----
+m.cav <- paSuit("moca", rd, axis.p = 'right', nar = F)
+
+insc1 <- paSuit('moca', rd, 'inset') +
+        coord_sf(
+                xlim = c(-67.5, -59),
+                ylim = c(11, 19),
+                expand = FALSE
+        )
+
+insc2 <- paSuit('moca', rd, 'inset') +
+        coord_sf(
+                xlim = c(-40, -33),
+                ylim = c(-22, -16),
+                expand = FALSE
+        )
+
+insc3 <- paSuit('moca', rd, 'inset') +
+        coord_sf(
+                xlim = c(3, 9),
+                ylim = c(-3, 3),
+                expand = FALSE
+        )
+
+
+m.cav.main <- m.cav +
+        annotate(
+                "rect",
+                xmin = -59,
+                xmax = -67.5,
+                ymin = 11,
+                ymax = 19,
+                color = "grey50",
+                alpha = 0,
+                size = 0.8
+        ) +
+        annotate(
+                "rect",
+                xmin = -33,
+                xmax = -40,
+                ymin = -16,
+                ymax = -22,
+                color = "grey50",
+                alpha = 0,
+                size = 0.8
+        ) +
+        annotate(
+                "rect",
+                xmin = 9,
+                xmax = 3,
+                ymin = -3,
+                ymax = 3,
+                color = "grey50",
+                alpha = 0,
+                size = 0.8
+        )+
+        annotate(
+                "segment",
+                x = c(-59,-60, 6.5),
+                y = c(16, -18, 3),
+                xend = c(-55,-40, 6.5),
+                yend = c(16, -18, 15),
+                lineend = "round",
+                colour = "grey50",
+                size = 0.8
+        ) +
+        annotation_custom(
+                grob = ggplotGrob(insc1),
+                xmin = -55,
+                xmax = -35,
+                ymin = 15,
+                ymax = 35
+        ) + annotation_custom(
+                grob = ggplotGrob(insc2),
+                xmin = -55,
+                xmax = -80,
+                ymin = 5,
+                ymax = -25
+        ) +
+        annotation_custom(
+                grob = ggplotGrob(insc3),
+                xmin = 0,
+                xmax = 18,
+                ymin = 10,
+                ymax = 30
+        )+
+        ggtitle("B")
+
+
+# Create the figure using pacthwork and save ----
+mcav.fig1 <- range.f + m.cav.main
+
+mcav.fig1
+
+ggsave("figures/fig3_moca_current.tiff", mcav.fig1, width = 41, height = 15, dpi = 300, units = 'cm')
+
+rm(list = ls())
+###END
+
+```
+
+```{r Current map of Siderastrea, fig.cap="Figure 4 Projected habitat suitability for Siderastrea in the Atlantic, as obtained through an ensemble modeling approach. Map (A) shows the presence points (in orange) used for training the model and shows (in purple) the expected range of Siderastrea according to the IUCN. Map (B) shows the predicted habitat suitability for the current period. In both maps, inset maps highlight the Abrolhos region (left), Cape Verde (top) and São Tomé islands (right).", fig.align="center", fig.height=5.9, fig.width=16.3, message=FALSE, warning=FALSE, echo = FALSE}
+
+### Generate map for current projection of Siderastrea ----
+
+# Load base objects for maps ----
+source("codes/graphs/plot_maps_base.R")
+
+# Establish the round code to generate map ----
+rd <- "rbf1"
+
+#Presence points map ----
+side1.iucn <- st_as_sf(shapefile("gis/iucn_maps/siderastrea_stellata.shp"))
+side2.iucn <- st_as_sf(shapefile("gis/iucn_maps/siderastrea_radians.shp"))
+
+side.pts <- read.csv("data/side/side_cell_thinned.csv")
+
+side.range <- base.tr + geom_sf(data = side1.iucn, fill = alpha("#785EF0", 1), color = NA) +
+        geom_sf(data = side2.iucn, fill = alpha("#785EF0", 1), color = NA) +
+        coord_sf(
+                xlim = c(-99, 22),
+                ylim = c(-42.5, 42.5),
+                expand = FALSE,
+                label_axes = list(top = "E", left = "N")
+        ) +
+        geom_point(data = side.pts, aes(x = decimalLongitude, y = decimalLatitude),
+                   color = "#FFD400", size = 1, alpha = 0.8) + n.arrow +
+        main.scale + main.theme + 
+        main.s.x + main.s.y 
+
+ins1 <- side.range +
+        coord_sf(
+                xlim = c(-49, -35),
+                ylim = c(-28.5, -15.5),
+                expand = FALSE
+        ) + inset.theme
+
+ins2 <- side.range +
+        coord_sf(
+                xlim = c(3, 8),
+                ylim = c(-3, 3),
+                expand = FALSE
+        ) + inset.theme
+
+ins3 <- side.range +
+        coord_sf(
+                xlim = c(-27, -21),
+                ylim = c(14, 20),
+                expand = FALSE
+        ) + inset.theme
+
+range.f <- side.range +
+        annotate(
+                "rect",
+                xmin = -49,
+                xmax = -35,
+                ymin = -28.5,
+                ymax = -15.5,
+                color = "grey50",
+                alpha = 0,
+                size = 0.8
+        ) +
+        annotate(
+                "rect",
+                xmin = 8,
+                xmax = 3,
+                ymin = -3,
+                ymax = 3,
+                color = "grey50",
+                alpha = 0,
+                size = 0.8
+        ) +
+        annotate(
+                "rect",
+                xmin = -27,
+                xmax = -21,
+                ymin = 14,
+                ymax = 20,
+                color = "grey50",
+                alpha = 0,
+                size = 0.8
+        ) +
+        annotate(
+                "segment",
+                #x1 > insh1 ; x2 > insh2
+                x = c(-49, 6.5, -24),
+                y = c(-23, 3, 20),
+                xend = c(-80, 6.5, -24),
+                yend = c(-23, 15, 30),
+                lineend = "round",
+                colour = "grey50",
+                size = 0.8
+        ) +
+        annotation_custom(
+                grob = ggplotGrob(ins1),
+                xmin = -92,
+                xmax = -56,
+                ymin = -30,
+                ymax = 2
+        ) +
+        annotation_custom(
+                grob = ggplotGrob(ins2),
+                xmin = 0,
+                xmax = 18,
+                ymin = 10,
+                ymax = 30
+        )+
+        annotation_custom(
+                grob = ggplotGrob(ins3),
+                xmin = -17,
+                xmax = -37,
+                ymin = 24,
+                ymax = 41
+        )+
+        ggtitle("A")
+
+
+#Current map ----
+side <- paSuit("side", rd, axis.p = 'right', nar = F)
+
+inss1 <- paSuit('side', rd, 'inset') +
+        coord_sf(
+                xlim = c(-67.5, -59),
+                ylim = c(11, 19),
+                expand = FALSE
+        )
+
+inss2 <- paSuit('side', rd, 'inset') +
+        coord_sf(
+                xlim = c(-40, -33),
+                ylim = c(-22, -16),
+                expand = FALSE
+        )
+
+inss3 <- paSuit('side', rd, 'inset') +
+        coord_sf(
+                xlim = c(3, 9),
+                ylim = c(-3, 3),
+                expand = FALSE
+        )
+
+inss4 <- paSuit('side', rd, 'inset') +
+        coord_sf(
+                xlim = c(-27, -21),
+                ylim = c(14, 20),
+                expand = FALSE
+        )
+
+
+
+side.main <- side +
+        annotate(
+                "rect",
+                xmin = -67.5,
+                xmax = -59,
+                ymin = 11,
+                ymax = 19,
+                color = "grey50",
+                alpha = 0,
+                size = 0.8
+        ) +
+        annotate(
+                "rect",
+                xmin = -40,
+                xmax = -33,
+                ymin = -22,
+                ymax = -16,
+                color = "grey50",
+                alpha = 0,
+                size = 0.8
+        ) +
+        annotate(
+                "rect",
+                xmin = 3,
+                xmax = 9,
+                ymin = -3,
+                ymax = 3,
+                color = "grey50",
+                alpha = 0,
+                size = 0.8
+        )+
+        annotate(
+                "rect",
+                xmin = -27,
+                xmax = -21,
+                ymin = 14,
+                ymax = 20,
+                color = "grey50",
+                alpha = 0,
+                size = 0.8
+        ) +
+        annotate(
+                "segment",
+                x = c(-63,-33, 6.5, -24),
+                y = c(11, -18, 3, 20),
+                xend = c(-63,0, 6.5, -24),
+                yend = c(-5, -18, 15, 30),
+                lineend = "round",
+                colour = "grey50",
+                size = 0.8
+        ) +
+        annotation_custom(
+                grob = ggplotGrob(inss1),
+                xmin = -57,
+                xmax = -87,
+                ymin = -20,
+                ymax = 3
+        ) + annotation_custom(
+                grob = ggplotGrob(inss2),
+                xmin = 6,
+                xmax = -24,
+                ymin = -15,
+                ymax = -38
+        ) +
+        annotation_custom(
+                grob = ggplotGrob(inss3),
+                xmin = 0,
+                xmax = 18,
+                ymin = 10,
+                ymax = 30
+        )+
+        annotation_custom(
+                grob = ggplotGrob(inss4),
+                xmin = -17,
+                xmax = -37,
+                ymin = 24,
+                ymax = 41
+        )+
+        ggtitle("B")
+
+# Create the figure using pacthwork and save ----
+side.fig1 <- range.f + side.main
+
+side.fig1
+
+ggsave("figures/fig5_side_current.tiff", side.fig1, width = 41, height = 15, dpi = 300, units = 'cm')
+
+rm(list = ls())
+###END
+
+```
+
+
+*Montastraea cavernosa* and *Siderastrea* are projected to
+experience net gains in suitable areas under the RCP2.6 and RCP4.5
+scenarios, but the amounts vary between species, with *M. cavernosa*
+gaining more area than *Siderastrea* under both scenarios (Table 3).
+Along the Brazilian coast, areas to the south would become suitable for
+*M. cavernosa* under the RCP2.6 and RCP4.5 scenarios, consistent with
+poleward increases in suitable areas (Figure 5). None of those areas
+would maintain suitability in the RCP8.5 scenario. *Siderastrea* showed
+similar patterns of increases in suitable areas along the Brazilian
+coast (Figure 6); however, it showed a smaller southward expansion when
+compared to *M. cavernosa*. Additionally, increases in suitable areas
+were projected in the Abrolhos region under the RCP2.6 and RCP4.5
+scenarios. In contrast to *M. cavernosa*, *Siderastrea* would still gain
+suitable areas under the RCP8.5 scenario. In the Northern Hemisphere,
+the models projected new suitable areas for both *M. cavernosa* and
+*Siderastrea* around their current occurrence ranges under the RCP2.6
+and RCP4.5 scenarios but not in the RCP8.5 scenario (Figures 5 and 6,
+respectively). A poleward increase in suitable areas (to the north) was
+projected for *M. cavernosa* in the RCP4.5 and RCP8.5 scenarios and for
+*Siderastrea* in all scenarios. Areas around Bermuda Island would also
+become suitable for *Siderastrea* in the RCP4.5 and RCP8.5 scenarios. In
+the eastern Atlantic, there were consistent increases in suitable areas
+for *M. cavernosa* and *Siderastrea* under all scenarios in the region
+of Guinea, in portions of the Gulf of Guinea and its islands, on Cape
+Verde islands and on seamounts from approximately 3°S to 16°S. As for
+*M. hispida*, no evident change in depth of suitable areas was
+identified for both species (Supplementary Table 2).
+
+```{r Future map of M. cavernosa, fig.cap="Figure 5 Projected habitat suitability for future  relative concentration pathway (RCP) scenarios for Montastraea cavernosa in the Atlantic obtained through an ensemble modeling approach. Models were trained on present-day data of the species and projected for the (A) RCP2.6, (B) RCP4.5 and (C) RCP8.5 scenarios. Inset maps highlight the changes in the Caribbean region (bottom left), São Tomé islands (right) and in the Abrolhos region (bottom).", fig.align="center", fig.height=16.3, fig.width=8.9, message=FALSE, warning=FALSE, echo = FALSE}
+
+### Generate map for future scenarios of Montastraea cavernosa ----
+
+# Load base objects for maps ----
+source("codes/graphs/plot_maps_base.R")
+
+# Establish the round code to generate map ----
+rd <- "rbf1"
+
+# Create a list to hold plots
+plots.list <- list()
+
+# Execute all the scenarios in loop ----
+for (i in 1:3) {
+        
+        rcp.code <- c("rcp26", "rcp45", "rcp85")[i]
+        
+        
+        if (i == 1) {
+                axis.sel <- "left-top"
+                nar.sel = TRUE
+        }
+        
+        
+        if (i == 2) {
+                axis.sel <- "left-only"
+                nar.sel = FALSE
+        }
+        
+        
+        if (i == 3) {
+                axis.sel <- "left"
+                nar.sel = FALSE
+        }
+        
+        if (i == 1) {
+                rcp.plot <-
+                        rcpSuit("moca", rd, rcp.code, 100, axis.p = axis.sel, nar = nar.sel)
+        }
+        
+        if (i != 1) {
+                rcp.plot <-
+                        rcpSuit("moca", rd, rcp.code, 100, axis.p = axis.sel, nar = nar.sel) +
+                        theme(legend.position = 'none')
+        }
+        
+
+        
+        ins1 <-
+                rcpSuit("moca",
+                        rd,
+                        rcp.code,
+                        100,
+                        axis.p = 'none',
+                        theme = 'inset') +
+                coord_sf(
+                        xlim = c(-67.5, -59),
+                        ylim = c(11, 19),
+                        expand = FALSE
+                )
+        
+        ins2 <-
+                rcpSuit("moca",
+                        rd,
+                        rcp.code,
+                        100,
+                        axis.p = 'none',
+                        theme = 'inset') +
+                coord_sf(
+                        xlim = c(-40, -33),
+                        ylim = c(-22, -16),
+                        expand = FALSE
+                )
+        
+        ins3 <-
+                rcpSuit("moca",
+                        rd,
+                        rcp.code,
+                        100,
+                        axis.p = 'none',
+                        theme = 'inset') +
+                coord_sf(
+                        xlim = c(3, 9),
+                        ylim = c(-3, 3),
+                        expand = FALSE
+                )
+        
+        
+        final.plot <- rcp.plot +
+                annotate(
+                        "rect",
+                        xmin = -59,
+                        xmax = -67.5,
+                        ymin = 11,
+                        ymax = 19,
+                        color = "grey50",
+                        alpha = 0,
+                        size = 0.8
+                ) +
+                annotate(
+                        "rect",
+                        xmin = -33,
+                        xmax = -40,
+                        ymin = -16,
+                        ymax = -22,
+                        color = "grey50",
+                        alpha = 0,
+                        size = 0.8
+                ) +
+                annotate(
+                        "rect",
+                        xmin = 9,
+                        xmax = 3,
+                        ymin = -3,
+                        ymax = 3,
+                        color = "grey50",
+                        alpha = 0,
+                        size = 0.8
+                )+
+                annotate(
+                        "segment",
+                        x = c(-59,-60, 6.5),
+                        y = c(16, -18, 3),
+                        xend = c(-55,-40, 6.5),
+                        yend = c(16, -18, 15),
+                        lineend = "round",
+                        colour = "grey50",
+                        size = 0.8
+                ) +
+                annotation_custom(
+                        grob = ggplotGrob(ins1),
+                        xmin = -55,
+                        xmax = -35,
+                        ymin = 15,
+                        ymax = 35
+                ) + annotation_custom(
+                        grob = ggplotGrob(ins2),
+                        xmin = -55,
+                        xmax = -80,
+                        ymin = 5,
+                        ymax = -25
+                ) +
+                annotation_custom(
+                        grob = ggplotGrob(ins3),
+                        xmin = 0,
+                        xmax = 18,
+                        ymin = 10,
+                        ymax = 30
+                )+  # The lines below are a "hack" to adjust the tag 
+                    # annotation position
+                theme(
+                        plot.margin = unit(c(0.5, 5, 0.5, 5), 'mm'),
+                        axis.title.y = element_text(
+                                margin = margin(t = 0, r = 20, b = 0, l = 0))
+                )+ylab(" ") 
+        
+        #Include the plost in the list
+        plots.list[[i]] <- final.plot
+
+}
+
+# Create the figure using pacthwork and save ----
+moca.fig2 <- plots.list[[1]] / plots.list[[2]] / plots.list[[3]] + 
+        plot_annotation(tag_levels = "A") &
+        theme(plot.tag.position = c(0, 0.95),
+              plot.tag = element_text(size = 18))
+
+moca.fig2
+
+ggsave("figures/fig4_moca_future.tiff", moca.fig2,
+       width = 22.5, height = 41, dpi = 300, units = 'cm')
+
+rm(list = ls())
+
+### END
+
+```
+
+```{r Future map of Siderastrea, fig.cap="Figure 6 Projected habitat suitability under future  relative concentration pathway (RCP) scenarios for Siderastrea in the Atlantic Ocean obtained through an ensemble modeling approach. The models were trained on present-day data of the species and projected for the (A) RCP2.6, (B) RCP4.5 and (C) RCP8.5 scenarios. Inset maps highlight changes in the Caribbean region (bottom left), Cape Verde islands (top), São Tomé islands (right) and Abrolhos region (bottom).", fig.align="center", fig.height=16.3, fig.width=8.9, message=FALSE, warning=FALSE, echo = FALSE}
+
+### Generate map for future scenarios of Siderastrea ----
+
+# Load base objects for maps ----
+source("codes/graphs/plot_maps_base.R")
+
+# Establish the round code to generate map ----
+rd <- "rbf1"
+
+# Create a list to hold plots
+plots.list <- list()
+
+# Execute all the scenarios in loop ----
+for (i in 1:3) {
+        
+        rcp.code <- c("rcp26", "rcp45", "rcp85")[i]
+        
+        
+        if (i == 1) {
+                axis.sel <- "left-top"
+                nar.sel = TRUE
+        }
+        
+        
+        if (i == 2) {
+                axis.sel <- "left-only"
+                nar.sel = FALSE
+        }
+        
+        
+        if (i == 3) {
+                axis.sel <- "left"
+                nar.sel = FALSE
+        }
+        
+        if (i == 1) {
+                rcp.plot <-
+                        rcpSuit("side", rd, rcp.code, 100, axis.p = axis.sel, nar = nar.sel)
+        }
+        
+        if (i != 1) {
+                rcp.plot <-
+                        rcpSuit("side", rd, rcp.code, 100, axis.p = axis.sel, nar = nar.sel) +
+                        theme(legend.position = 'none')
+        }
+        
+        ins1 <-
+                rcpSuit("side",
+                        rd,
+                        rcp.code,
+                        100,
+                        axis.p = 'none',
+                        theme = 'inset') +
+                coord_sf(
+                        xlim = c(-67.5, -59),
+                        ylim = c(11, 19),
+                        expand = FALSE
+                )
+        
+        ins2 <-
+                rcpSuit("side",
+                        rd,
+                        rcp.code,
+                        100,
+                        axis.p = 'none',
+                        theme = 'inset') +
+                coord_sf(
+                        xlim = c(-40, -33),
+                        ylim = c(-22, -16),
+                        expand = FALSE
+                )
+        
+        ins3 <-
+                rcpSuit("side",
+                        rd,
+                        rcp.code,
+                        100,
+                        axis.p = 'none',
+                        theme = 'inset') +
+                coord_sf(
+                        xlim = c(3, 9),
+                        ylim = c(-3, 3),
+                        expand = FALSE
+                )
+        
+        ins4 <-
+                rcpSuit("side",
+                        rd,
+                        rcp.code,
+                        100,
+                        axis.p = 'none',
+                        theme = 'inset') +
+                coord_sf(
+                        xlim = c(-27, -21),
+                        ylim = c(14, 20),
+                        expand = FALSE
+                )
+        
+        
+        final.plot <- rcp.plot +
+                annotate(
+                        "rect",
+                        xmin = -67.5,
+                        xmax = -59,
+                        ymin = 11,
+                        ymax = 19,
+                        color = "grey50",
+                        alpha = 0,
+                        size = 0.8
+                ) +
+                annotate(
+                        "rect",
+                        xmin = -40,
+                        xmax = -33,
+                        ymin = -22,
+                        ymax = -16,
+                        color = "grey50",
+                        alpha = 0,
+                        size = 0.8
+                ) +
+                annotate(
+                        "rect",
+                        xmin = 3,
+                        xmax = 9,
+                        ymin = -3,
+                        ymax = 3,
+                        color = "grey50",
+                        alpha = 0,
+                        size = 0.8
+                )+
+                annotate(
+                        "rect",
+                        xmin = -27,
+                        xmax = -21,
+                        ymin = 14,
+                        ymax = 20,
+                        color = "grey50",
+                        alpha = 0,
+                        size = 0.8
+                ) +
+                annotate(
+                        "segment",
+                        x = c(-63,-33, 6.5, -24),
+                        y = c(11, -18, 3, 20),
+                        xend = c(-63,0, 6.5, -24),
+                        yend = c(-5, -18, 15, 30),
+                        lineend = "round",
+                        colour = "grey50",
+                        size = 0.8
+                ) +
+                annotation_custom(
+                        grob = ggplotGrob(ins1),
+                        xmin = -57,
+                        xmax = -87,
+                        ymin = -20,
+                        ymax = 3
+                ) + annotation_custom(
+                        grob = ggplotGrob(ins2),
+                        xmin = 6,
+                        xmax = -24,
+                        ymin = -15,
+                        ymax = -38
+                ) +
+                annotation_custom(
+                        grob = ggplotGrob(ins3),
+                        xmin = 0,
+                        xmax = 18,
+                        ymin = 10,
+                        ymax = 30
+                )+
+                annotation_custom(
+                        grob = ggplotGrob(ins4),
+                        xmin = -17,
+                        xmax = -37,
+                        ymin = 24,
+                        ymax = 41
+                )+  # The lines below are a "hack" to adjust the tag 
+                # annotation position
+                theme(
+                        plot.margin = unit(c(0.5, 5, 0.5, 5), 'mm'),
+                        axis.title.y = element_text(
+                                margin = margin(t = 0, r = 20, b = 0, l = 0))
+                )+ylab(" ") 
+        
+        plots.list[[i]] <- final.plot
+
+}
+
+# Create the figure using pacthwork and save ----
+side.fig2 <- plots.list[[1]] / plots.list[[2]] / plots.list[[3]] +
+        plot_annotation(tag_levels = "A") &
+        theme(plot.tag.position = c(0, 0.95),
+              plot.tag = element_text(size = 18))
+
+side.fig2
+
+ggsave("figures/fig6_side_future.tiff", side.fig2,
+       width = 22.5, height = 41, dpi = 300, units = 'cm')
+
+rm(list = ls())
+
+###END
+
+```
+
+
+Despite the net gains in suitable areas under the RCP2.6 and RCP4.5
+scenarios, both *M. cavernosa* and *Siderastrea* would lose suitable
+areas in regions that are currently adequate for the species.
+Additionally, in the RCP8.5 scenario, both species would experience net
+losses in suitable areas (Table 3). Along the Brazilian coast, *M.
+cavernosa* would lose suitable areas in its northern limit in the RCP2.6
+and RCP4.5 scenarios and in the Abrolhos region in the RCP4.5 scenario
+(Figure 5). The RCP8.5 scenario is more drastic than the other two
+scenarios; *M. cavernosa* would vanish from the entire Brazilian coast,
+with the exception of Fernando de Noronha Island and most of the
+Caribbean and Gulf of Mexico. For *Siderastrea*, the loss of suitable
+areas along the Brazilian coast includes both the northern and southern
+limits; the most critical loss is projected under the RCP8.5 scenario,
+in which only the areas from 1.5°S to 11°S are retained. None of the
+areas in the eastern Atlantic were lost in any scenario for either
+species.
+
+We also stacked the future projections for all species to analyze how
+climate change may affect the composition of species (Figure 7). This
+projection reflects the composition of suitable niches for this group of
+species and not the actual composition, as a given species may not occur
+in the full extent of its suitable modeled niche. The areas where the
+number of species would be reduced were consistent among the three
+scenarios. However, in the RCP8.5 scenario, the loss of species is
+higher in several areas and seems to be critical in the tropical North
+Atlantic and on the Brazilian coast. Areas in the Gulf of Mexico that
+are shared by *Siderastrea* and *M. cavernosa* would become dominated by
+*Siderastrea* in the RCP8.5 scenario. Additionally, in all scenarios,
+areas in the Caribbean and the Gulf of Mexico would completely lose
+suitability for both *Siderastrea* and *M. cavernosa*. On the Brazilian
+coast, losses of species are expected along the coastal extension in all
+scenarios, and this loss is critical in the RCP8.5 scenario. This is
+mainly due to the loss of suitable areas for *M. hispida* and *M.
+cavernosa* in this region. Under this scenario, major losses are
+concentrated in the Abrolhos region and the Vitória-Trindade seamount
+chain, which mainly reflects the reduction of suitable areas for *M.
+hispida*. In the RCP8.5 scenario, all species would be lost in the
+Abrolhos region; in northern Brazil, only *Siderastrea* would remain.
+
+The areas where the number of species would increase differed between
+the RCP8.5 scenario and the other two scenarios, but there were
+consistent increases in the suitable habitat area in the Eastern
+Atlantic in all scenarios. In the RCP2.6 and RCP4.5 scenarios, areas
+along Georgia and South Carolina and in the Gulf of Mexico and Caribbean
+Sea would become adequate for *Siderastrea* and *M. cavernosa*. Some
+areas in the Yucatan Channel and in the Bahamas could also experience
+increases in the number of species due to the expansion of suitable
+areas for *M. hispida*. It is also important to note that some areas
+along the Caribbean, Gulf of México and around Florida that are
+predicted to keep at least one species are, in fact, areas where there
+is suitable habitat for *M. hispida; however*, this species is currently
+restricted to Brazil. Along the Brazilian coast, increases in the number
+of species are expected in the southern limits of the corals studied
+here under the RCP2.6 and RCP4.5 scenarios and in Northeast/North Brazil
+under all scenarios (but reduced in the RCP8.5 scenario). Compared to
+the current period, changes were predicted for almost all regions where
+suitable areas were projected for the modeled species.
+
+A map with the current composition of suitable niches for the three
+species is provided in Supplementary Figure 4. An interactive version of
+the results section is available at
+http://silasprincipe.github.io/reefbuilders.
+
+```{r Composition map, fig.cap="Figure 7 Future composition of adequate habitats for reef builder species in the western Atlantic obtained through species distribution models generated for three species: M. hispida, M. cavernosa and Siderastrea. Map (A) shows the number of species gained (positive values - green scale) or lost (negative values - yellow scale) in the RCP2.6 scenario in comparison to the current climate. The same is shown for the RCP4.5 (B) and RCP8.5 (C) scenarios. The dark gray depicts no change in the number of species.", fig.align="center", fig.height=16.3, fig.width=8.9, message=FALSE, warning=FALSE, echo = FALSE}
+
+###### Reef-builders modelling #######
+#Silas C. Principe - 2020
+#silasprincipe@yahoo.com.br
+#Collaboration: André L. Acosta
+
+### Generate map with the composition of species ----
+
+# Load base objects for maps ----
+source("codes/graphs/plot_maps_base.R")
+
+# Establish the round code to generate map ----
+rd <- "rbf1"
+
+#Change of composition (amount) function ----
+changeSuit <-
+        function(round.code,
+                 rcp,
+                 year,
+                 theme = 'main',
+                 nar = F,
+                 axis.p = 'left') {
+                current <- stack()
+                
+                for (i in 1:3) {
+                        sp <- c("muhi", "moca", "side")[i]
+                        
+                        orig <- raster(
+                                paste0(
+                                        sp,
+                                        "/proj_current_",
+                                        sp,
+                                        "_",
+                                        round.code,
+                                        "/individual_projections/",
+                                        sp,
+                                        "_EMcaByTSS_mergedAlgo_mergedRun_mergedData.img"
+                                )
+                        )
+                        
+                        # eval <-
+                        #         read.csv(
+                        #                 paste0(
+                        #                         sp,
+                        #                         "/evals/ensemble_eval_",
+                        #                         sp,
+                        #                         "_",
+                        #                         round.code,
+                        #                         ".csv"
+                        #                 )
+                        #         )
+                        #
+                        # eval <-
+                        #         eval[eval$Model.name %in% c("EMwmeanByTSS_mergedAlgo_mergedRun_mergedData"),]
+                        # eval <-
+                        #         eval %>% filter(Eval.metric == 'TSS')
+                        # thres <- eval$Cutoff
+                        thres <- 750
+                        
+                        orig[orig < thres] <- 0
+                        orig[orig >= thres] <- 1
+                        
+                        current <- stack(current, orig)
+                }
+                
+                future <- stack()
+                
+                for (i in 1:3) {
+                        sp <- c("muhi", "moca", "side")[i]
+                        
+                        fut <-
+                                raster(
+                                        paste0(
+                                                sp,
+                                                "/proj_",
+                                                rcp,
+                                                "_",
+                                                #year,
+                                                #"_",
+                                                sp,
+                                                "_",
+                                                round.code,
+                                                "/individual_projections/",
+                                                sp,
+                                                "_EMcaByTSS_mergedAlgo_mergedRun_mergedData.img"
+                                        )
+                                )
+                        
+                        # eval <-
+                        #         read.csv(
+                        #                 paste0(
+                        #                         sp,
+                        #                         "/evals/ensemble_eval_",
+                        #                         sp,
+                        #                         "_",
+                        #                         round.code,
+                        #                         ".csv"
+                        #                 )
+                        #         )
+                        #
+                        # eval <-
+                        #         eval[eval$Model.name %in% c("EMwmeanByTSS_mergedAlgo_mergedRun_mergedData"),]
+                        # eval <-
+                        #         eval %>% filter(Eval.metric == 'TSS')
+                        # thres <- eval$Cutoff
+                        thres <- 750
+                        
+                        fut[fut < thres] <- 0
+                        fut[fut >= thres] <- 1
+                        
+                        future <- stack(future, fut)
+                }
+                
+                #Sum to get species composition
+                current <- sum(current)
+                
+                future <- sum(future)
+                
+                #Get the difference
+                r <- current - future
+                
+                temp <- as.data.frame(xyFromCell(r, 1:length(r)))
+                temp$values <- values(r)
+                
+                
+                #Create the levels according to code
+                temp <- temp %>%
+                        mutate(
+                                level = case_when(
+                                        values == -3 ~ "3",
+                                        values == -2 ~ "2",
+                                        values == -1 ~ "1",
+                                        values == 3 ~ "-3",
+                                        values == 2 ~ "-2",
+                                        values == 1 ~ "-1",
+                                        values == 0 ~ "0",
+                                        is.na(values) ~ "NA",
+                                        TRUE ~ as.character(values)
+                                )
+                        )
+                
+                #Create the scale of colors
+                main.scale <- scale_fill_manual(
+                        values = c(
+                                alpha(c("#F3F1EA"), 0),
+                                "#fa5f05",
+                                "#f3b70d",
+                                "#fcff2d",
+                                c.pa.1,
+                                "#b0f4ef",
+                                "#44eab0",
+                                "#0a7b4e"
+                        ),
+                        limits = c("NA", "-3", "-2", "-1", "0", "1", "2", "3"),
+                        breaks = c("3", "2", "1", "0", "-1", "-2", "-3"),
+                        labels = c("+3", "+2", "+1", "No change", "-1", "-2", "-3"),
+                        name = "Change in composition"
+                )
+                
+                
+                if (axis.p == 'left') {
+                        first <- base
+                }
+                
+                if (axis.p == 'right') {
+                        first <- base.tr
+                }
+                
+                if (axis.p == 'left-top') {
+                        first <- base.tl
+                }
+                
+                if (axis.p == 'right-bottom') {
+                        first <- base.br
+                }
+                
+                if (axis.p == 'bottom') {
+                        first <- base.b
+                }
+                
+                if (axis.p == 'left-only') {
+                        first <- base.lo
+                }
+                
+                if (axis.p == 'none') {
+                        first <-
+                                base + theme(axis.ticks = element_blank(),
+                                             axis.text = element_blank())
+                }
+                
+                if (theme == 'main') {
+                        if (nar == T) {
+                                map <- first +
+                                        geom_raster(data = temp,
+                                                    aes(
+                                                            x = x,
+                                                            y = y,
+                                                            fill = level
+                                                    )) +
+                                        main.scale + main.theme + 
+                                        main.s.x + main.s.y + n.arrow
+                        }
+                        if (nar == F) {
+                                map <- first +
+                                        geom_raster(data = temp,
+                                                    aes(
+                                                            x = x,
+                                                            y = y,
+                                                            fill = level
+                                                    )) +
+                                        main.scale + main.theme + 
+                                        main.s.x + main.s.y
+                        }
+                }
+                
+                return(map)
+        }
+
+
+
+
+### Generate change maps for each RCP ----
+rcp26 <- changeSuit(rd, "rcp26", nar = T, axis.p = "left-top") +
+        theme(legend.position = c(0.24, 0)) +
+        # The lines below are a "hack" to adjust the tag 
+        # annotation position
+        theme(
+                plot.margin = unit(c(0.5, 5, 0.5, 5), 'mm'),
+                axis.title.y = element_text(
+                        margin = margin(t = 0, r = 20, b = 0, l = 0))
+        )+ylab(" ") 
+
+rcp45 <-
+        changeSuit(rd, "rcp45", nar = F, axis.p = "left-only") + 
+        theme(legend.position = "none") +
+        # The lines below are a "hack" to adjust the tag 
+        # annotation position
+        theme(
+                plot.margin = unit(c(0.5, 5, 0.5, 5), 'mm'),
+                axis.title.y = element_text(
+                        margin = margin(t = 0, r = 20, b = 0, l = 0))
+        )+ylab(" ") 
+
+rcp85 <-
+        changeSuit(rd, "rcp85", nar = F, axis.p = "left") + 
+        theme(legend.position = "none") +
+        # The lines below are a "hack" to adjust the tag 
+        # annotation position
+        theme(
+                plot.margin = unit(c(0.5, 5, 0.5, 5), 'mm'),
+                axis.title.y = element_text(
+                        margin = margin(t = 0, r = 20, b = 0, l = 0))
+        )+ylab(" ") 
+
+# Assemble using patchwork
+ga <- rcp26 / rcp45 / rcp85 + 
+        plot_annotation(tag_levels = "A") &
+        theme(plot.tag.position = c(0, 0.95),
+              plot.tag = element_text(size = 18))
+
+ga
+
+
+#Save figure ----
+ggsave(
+        "figures/fig7_composition.tiff",
+        ga,
+        width = 22.5,
+        height = 41,
+        dpi = 300,
+        units = 'cm'
+)
+
+rm(list = ls())
+###END OF MAP GENERATION
+
+```
+
+## Session Info
+
+```{r}
+sessionInfo()
+```
+
