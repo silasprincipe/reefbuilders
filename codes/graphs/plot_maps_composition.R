@@ -153,7 +153,7 @@ changeSuit <-
                         limits = c("NA", "-3", "-2", "-1", "0", "1", "2", "3"),
                         breaks = c("3", "2", "1", "0", "-1", "-2", "-3"),
                         labels = c("+3", "+2", "+1", "No change", "-1", "-2", "-3"),
-                        name = "Change in composition"
+                        name = "Change in \ncomposition"
                 )
                 
                 
@@ -220,7 +220,7 @@ changeSuit <-
 
 ### Generate change maps for each RCP ----
 rcp26 <- changeSuit(rd, "rcp26", nar = T, axis.p = "left-top") +
-        theme(legend.position = c(0.24, 0)) +
+        theme(legend.position = c(0.2, 0)) +
         # The lines below are a "hack" to adjust the tag 
         # annotation position
         theme(

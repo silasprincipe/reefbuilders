@@ -8,6 +8,16 @@
 # Load base objects for maps ----
 source("codes/graphs/plot_maps_base.R")
 
+# Modify theme components ----
+# The lines below includes a "hack" to adjust the tag 
+# annotation position
+mod.theme <- theme(
+        axis.text = element_text(size = 14, face = "bold"),
+        legend.position = c(0.23, 0.04),
+        plot.margin = unit(c(0.5, 5, 0.5, 5), 'mm'),
+        axis.title.y = element_text(
+                margin = margin(t = 0, r = 20, b = 0, l = 0)))
+
 # Establish the round code to generate map ----
 rd <- "rbf1"
 
@@ -63,13 +73,15 @@ m.hisp.range.f <- m.hisp.range +
                 ymin = -30,
                 ymax = 3
         ) +
-        ggtitle("A")
+        mod.theme +
+        ylab(" ") 
 
 
 
 
 #Current map ----
-m.hisp <- paSuit("muhi", rd, axis.p = 'right', nar = F)
+m.hisp <- paSuit("muhi", rd, axis.p = 'left', nar = F) +
+        theme(axis.text = element_text(size = 10))
 
 insh1 <- paSuit('muhi', rd, 'inset') +
         coord_sf(
@@ -132,13 +144,19 @@ m.hisp.main <- m.hisp +
                 ymin = 0,
                 ymax = -16
         ) +
-        ggtitle("B")
+       mod.theme +
+       ylab(" ") 
+
 
 
 # Create the figure using pacthwork and save ----
-muhi.fig1 <- m.hisp.range.f + m.hisp.main
+muhi.fig1 <- m.hisp.range.f / m.hisp.main +
+        plot_annotation(tag_levels = "A") &
+        theme(plot.tag.position = c(0, 0.95),
+              plot.tag = element_text(size = 18))
 
-ggsave("figures/fig1_muhi_current.tiff", muhi.fig1, width = 41, height = 15, dpi = 300, units = 'cm')
+ggsave("figures/fig1_muhi_current.tiff", muhi.fig1, width = 20, height = 30,
+       dpi = 300, units = 'cm')
 
 rm(list = ls())
 gc()

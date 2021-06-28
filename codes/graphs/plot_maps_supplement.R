@@ -12,9 +12,10 @@ source("codes/graphs/plot_maps_base_supplement.R")
 comp.cur <- currentSuit("rbf1",
                         nar = T)
 
-comp.cur <- comp.cur+theme(legend.position = c(0.2, 0))
+comp.cur <- comp.cur+theme(legend.position = c(0.31, 0.02),
+                           legend.text.align = 0)
 
-ggsave("figures/sf4_current_composition.tiff", comp.cur, dpi = 300,
+ggsave("figures/sf7_current_composition.tiff", comp.cur, dpi = 300,
        width = 17,
        height = 9)
 
@@ -26,7 +27,7 @@ for (i in 1:3) {
         
         current <- bootMap(sp = species, scen = "current", 
                            nar = T, axis.p = "left-top")+
-                theme(legend.position = c(0.1, 0))+
+                theme(legend.position = c(0.15, 0.05))+
                 annotate(
                         "text",
                         x = 18,
@@ -38,6 +39,7 @@ for (i in 1:3) {
                 )
         current.var <- bootMapVar(sp = species, scen = "curens",
                                   nar = F, axis.p = "right")+
+                theme(legend.position = c(0.27, 0.05))+
                 annotate(
                         "text",
                         x = 18,
@@ -124,3 +126,8 @@ for (i in 1:3) {
                quality = 100)
         
 }
+
+rm(list = ls())
+gc()
+
+###END

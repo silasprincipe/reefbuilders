@@ -8,6 +8,16 @@
 # Load base objects for maps ----
 source("codes/graphs/plot_maps_base.R")
 
+# Modify theme components ----
+# The lines below includes a "hack" to adjust the tag 
+# annotation position
+mod.theme <- theme(
+        axis.text = element_text(size = 14, face = "bold"),
+        legend.position = c(0.23, 0.04),
+        plot.margin = unit(c(0.5, 5, 0.5, 5), 'mm'),
+        axis.title.y = element_text(
+                margin = margin(t = 0, r = 20, b = 0, l = 0)))
+
 # Establish the round code to generate map ----
 rd <- "rbf1"
 
@@ -114,11 +124,12 @@ range.f <- side.range +
                 ymin = 24,
                 ymax = 41
         )+
-        ggtitle("A")
+        mod.theme +
+        ylab(" ") 
 
 
 #Current map ----
-side <- paSuit("side", rd, axis.p = 'right', nar = F)
+side <- paSuit("side", rd, axis.p = 'left', nar = F)
 
 inss1 <- paSuit('side', rd, 'inset') +
         coord_sf(
@@ -228,12 +239,17 @@ side.main <- side +
                 ymin = 24,
                 ymax = 41
         )+
-        ggtitle("B")
+        mod.theme +
+        ylab(" ") 
 
 # Create the figure using pacthwork and save ----
-side.fig1 <- range.f + side.main
+side.fig1 <- range.f / side.main +
+        plot_annotation(tag_levels = "A") &
+        theme(plot.tag.position = c(0, 0.95),
+              plot.tag = element_text(size = 18))
 
-ggsave("figures/fig5_side_current.tiff", side.fig1, width = 41, height = 15, dpi = 300, units = 'cm')
+ggsave("figures/fig5_side_current.tiff", side.fig1, width = 20, height = 30,
+       dpi = 300, units = 'cm')
 
 rm(list = ls())
 gc()

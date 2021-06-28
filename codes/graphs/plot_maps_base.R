@@ -43,12 +43,12 @@ main.theme <-
                                                 colour = "#494949"),
                 #panel.grid.major = element_blank(), #If wanted to remove line grid
                 axis.ticks.length = unit(0.8, "mm"),
-                axis.text = element_text(size = 10),
+                axis.text = element_text(size = 14, face = "bold"),
                 legend.justification = c(1, 0),
-                legend.position = c(0.16, 0),
+                legend.position = c(0.17, 0),
                 legend.background = element_blank(),
-                legend.title = element_text(size = 10),
-                legend.text = element_text(size = 10),
+                legend.title = element_text(size = 12, color = "white", face = "bold"),
+                legend.text = element_text(size = 12, color = "white", face = "bold"),
                 legend.key.size = unit(6, 'mm'),
                 legend.key = element_rect(colour = "#696969", size =
                                                   2.5),
@@ -179,11 +179,17 @@ rcp.scale <-
 
 
 ### Main maps xis scales
+# main.s.x <-
+#         scale_x_continuous(breaks = seq(18,-100,-10),
+#                            limits = c(-100,22))
+# main.s.y <-
+#         scale_y_continuous(breaks = seq(-40, 40, 10),
+#                            limits = c(-42.5, 42.5))
 main.s.x <-
-        scale_x_continuous(breaks = seq(18,-100,-10),
+        scale_x_continuous(breaks = seq(15,-100,-15),
                            limits = c(-100,22))
 main.s.y <-
-        scale_y_continuous(breaks = seq(-40, 40, 10),
+        scale_y_continuous(breaks = seq(-30, 30, 15),
                            limits = c(-42.5, 42.5))
 
 ### Arrow ----

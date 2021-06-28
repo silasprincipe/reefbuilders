@@ -8,6 +8,16 @@
 # Load base objects for maps ----
 source("codes/graphs/plot_maps_base.R")
 
+# Modify theme components ----
+# The lines below includes a "hack" to adjust the tag 
+# annotation position
+mod.theme <- theme(
+        axis.text = element_text(size = 14, face = "bold"),
+        legend.position = c(0.23, 0.04),
+        plot.margin = unit(c(0.5, 5, 0.5, 5), 'mm'),
+        axis.title.y = element_text(
+                margin = margin(t = 0, r = 20, b = 0, l = 0)))
+
 # Establish the round code to generate map ----
 rd <- "rbf1"
 
@@ -86,12 +96,13 @@ range.f <- moca.range +
                 xmax = 18,
                 ymin = 10,
                 ymax = 30
-        )+
-        ggtitle("A")
+        ) +
+        mod.theme +
+        ylab(" ") 
 
 
 #Current map ----
-m.cav <- paSuit("moca", rd, axis.p = 'right', nar = F)
+m.cav <- paSuit("moca", rd, axis.p = 'left', nar = F)
 
 insc1 <- paSuit('moca', rd, 'inset') +
         coord_sf(
@@ -175,14 +186,19 @@ m.cav.main <- m.cav +
                 xmax = 18,
                 ymin = 10,
                 ymax = 30
-        )+
-        ggtitle("B")
+        ) +
+        mod.theme +
+        ylab(" ") 
 
 
 # Create the figure using pacthwork and save ----
-mcav.fig1 <- range.f + m.cav.main
+mcav.fig1 <- range.f / m.cav.main +
+        plot_annotation(tag_levels = "A") &
+        theme(plot.tag.position = c(0, 0.95),
+              plot.tag = element_text(size = 18))
 
-ggsave("figures/fig3_moca_current.tiff", mcav.fig1, width = 41, height = 15, dpi = 300, units = 'cm')
+ggsave("figures/fig3_moca_current.tiff", mcav.fig1, width = 20, height = 30,
+       dpi = 300, units = 'cm')
 
 rm(list = ls())
 gc()
