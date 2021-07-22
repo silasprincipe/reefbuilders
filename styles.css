@@ -52,6 +52,7 @@ a.navbar-brand:hover {
 
 .hero-image {
     position: relative;
+    margin-top: -2em;
     margin-bottom: 2em;
     /* liner gradient tints the image darker for readability*/
     background-image: linear-gradient( rgba(0,0,0,.2), rgba(0,0,0,.2) ), url(wales.jpg); 
