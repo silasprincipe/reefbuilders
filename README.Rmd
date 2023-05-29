@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-  This project assessed how climate change will impact the distribution of three important reef builders of the Western Atlantic. This was done using SDM tools in an ensemble framework. For more details, reader is referred to the publication "Predicted shifts in the distributions of Atlantic reef-building corals in the face of climate change" (under consideration for publishing). All codes and data used in the study are available in this folder, except original climatic layers, which are available online. NOTE: some data will be available uppon publishing of the article.  
+  This project assessed how climate change will impact the distribution of three important reef builders of the Western Atlantic. This was done using SDM tools in an ensemble framework. For more details, reader is referred to the publication ["Predicted shifts in the distributions of Atlantic reef-building corals in the face of climate change"](https://www.frontiersin.org/articles/10.3389/fmars.2021.673086/full). All codes and data used in the study are available in this folder, except original climatic layers, which are available online. 
   
 ## Interactive results
   

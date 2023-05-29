@@ -1,0 +1,9 @@
+To reduce the size of the file in FigShare/Github we converted the sensity maps to tif (but the OccurrenceThinner uses .asc). To convert again just run this code on R:
+
+library(raster)
+
+r <- raster("data/thinning/side_density.tif")
+writeRaster(r, "data/thinning/side_density.asc")
+
+r <- raster("data/thinning/moca_density.tif")
+writeRaster(r, "data/thinning/moca_density.asc")
